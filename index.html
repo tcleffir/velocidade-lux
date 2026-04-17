@@ -1075,14 +1075,13 @@ const DataService = {
     const _evAbrNovos = _evAbr.filter(e => e.vendedorId && !_idsExistentes.has(e.id));
     this._cache.eventos.push(..._evAbrNovos);
 
-    /* Migração 10b: Garante últimos fechamentos do mês na barra inferior do Q3 */
-    if (!this._cache.ultimos_fechamentos || this._cache.ultimos_fechamentos.length === 0) {
-      this._cache.ultimos_fechamentos = [
-        { cliente: 'Maestro do Brasil',            executivo: 'Gabriel Gracia',    valor: 2200, data: '15/04/2026' },
-        { cliente: 'MEC Plant',                    executivo: 'Brenda Gino',       valor: 2500, data: '14/04/2026' },
-        { cliente: 'MAM Museu de Arte Moderna RJ', executivo: 'Brunno Meneguette', valor: 3000, data: '02/04/2026' },
-      ];
-    }
+    /* Migração 10b: Garante os 3 cards de fechamento exibidos no Q3 — cláusula pétrea.
+       Para alterar os cards, atualize esta lista e faça deploy. */
+    this._cache.ultimos_fechamentos = [
+      { cliente: 'Cibra Minérios (Indústria)',    executivo: 'Brenda Gino',       valor:  990, data: '16/04/2026' },
+      { cliente: 'Maestro do Brasil',             executivo: 'Gabriel Gracia',    valor: 2200, data: '15/04/2026' },
+      { cliente: 'MEC Plant',                     executivo: 'Brenda Gino',       valor: 2500, data: '14/04/2026' },
+    ];
 
     /* Migração 12: Histórico 2025 e 2026 — CLÁUSULA PÉTREA
        Estes dados reais nunca devem ser sobrescritos pelo Gist ou localStorage. */
@@ -1629,11 +1628,13 @@ const Renderers = {
       </div>
     `).join('');
 
-    /* Badge de totais: quantidade + faturamento */
+    /* Badge de totais: usa TODOS os fechamentos do mês atual (eventos), não só os cards */
     const totaisBadge = document.getElementById('fech-totais-badge');
     if (totaisBadge) {
-      const totalFat = ultimosFechamentos.reduce((s, f) => s + (f.valor || 0), 0);
-      totaisBadge.textContent = `${ultimosFechamentos.length} fech. · ${Utils.formataMoeda(totalFat)}`;
+      const mesAtualStr = new Date().toISOString().slice(0, 7);
+      const todosFechMes = DataService.getFechamentos().filter(e => e.data && e.data.startsWith(mesAtualStr));
+      const totalFat = todosFechMes.reduce((s, e) => s + (e.valorGestao || 0), 0);
+      totaisBadge.textContent = `${todosFechMes.length} fech. · ${Utils.formataMoeda(totalFat)}`;
     }
   },
 
