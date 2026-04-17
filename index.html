@@ -955,6 +955,17 @@ const DataService = {
   },
 
   _applyMigrations() {
+    /* Migração 0: Normaliza campos antigos do Gist (retrocompatibilidade) */
+    if (this._cache.metas) {
+      const m = this._cache.metas;
+      if (m.fechamentosExecutivo !== undefined && m.fechamentosPorExecutivo === undefined) {
+        m.fechamentosPorExecutivo = m.fechamentosExecutivo;
+        delete m.fechamentosExecutivo;
+      }
+      if (!m.reunioesPorEDN)          m.reunioesPorEDN          = 12;
+      if (!m.fechamentosPorExecutivo) m.fechamentosPorExecutivo = 3;
+    }
+
     /* Migração 6: Destaques de Março 2026 (dados reais) */
     const d = this._cache.destaques_anterior;
     if (!d || !d.mes || d.mes !== 'Março 2026' || !d.fechamentos || !d.receita) {

@@ -522,7 +522,7 @@ const GistService = {
     const d = this._data;
     if (!Array.isArray(d.equipe))             d.equipe = [];
     if (!Array.isArray(d.eventos))            d.eventos = [];
-    if (!d.metas)                             d.metas = { reunioesPorEDN: 12, fechamentosExecutivo: 3 };
+    if (!d.metas)                             d.metas = { reunioesPorEDN: 12, fechamentosPorExecutivo: 3 };
     if (!d.destaques_anterior)                d.destaques_anterior = { mes: '', reunioes: null, fechamentos: null, receita: null };
     if (!Array.isArray(d.ultimos_fechamentos)) d.ultimos_fechamentos = [];
     if (!d.historico_2026)                    d.historico_2026 = { reunioes: Array(12).fill(0), fechamentos: Array(12).fill(0) };
@@ -1022,16 +1022,16 @@ const Admin = {
     const edns = (GistService.getData().equipe || []).filter(v => v.perfil === 'EDN' || v.perfil === 'Ambos').length;
     const execs= (GistService.getData().equipe || []).filter(v => v.perfil === 'Executivo' || v.perfil === 'Ambos').length;
     document.getElementById('meta-reun').value = m.reunioesPorEDN || 12;
-    document.getElementById('meta-fech').value = m.fechamentosExecutivo || 3;
+    document.getElementById('meta-fech').value = m.fechamentosPorExecutivo || 3;
     document.getElementById('meta-reun-total').textContent = `Com ${edns} EDNs → meta total: ${edns * (m.reunioesPorEDN||12)} reuniões`;
-    document.getElementById('meta-fech-total').textContent = `Com ${execs} Executivos → meta total: ${execs * (m.fechamentosExecutivo||3)} fechamentos`;
+    document.getElementById('meta-fech-total').textContent = `Com ${execs} Executivos → meta total: ${execs * (m.fechamentosPorExecutivo||3)} fechamentos`;
   },
 
   salvarMetas() {
     const d = GistService.getData();
     d.metas = {
       reunioesPorEDN:       parseInt(document.getElementById('meta-reun').value) || 12,
-      fechamentosExecutivo: parseInt(document.getElementById('meta-fech').value) || 3,
+      fechamentosPorExecutivo: parseInt(document.getElementById('meta-fech').value) || 3,
     };
     this.renderMetas();
     GistService.save();
