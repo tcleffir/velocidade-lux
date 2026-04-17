@@ -1028,7 +1028,9 @@ const DataService = {
     const _fid = (nome, sobrenome) =>
       (this._cache.equipe.find(m => m.nome === nome && (!sobrenome || m.sobrenome === sobrenome)) || {}).id || null;
 
-    this._cache.eventos = this._cache.eventos.filter(e => !e.data || !e.data.startsWith('2026-04'));
+    /* Injeta apenas os eventos hardcoded que ainda não existem no cache.
+       Eventos adicionados pelo Admin são preservados intactos. */
+    const _idsExistentes = new Set(this._cache.eventos.map(e => e.id));
 
     const _evAbr = [
       /* — Reuniões realizadas — */
@@ -1070,7 +1072,8 @@ const DataService = {
       { id:'_afF', vendedorId:_fid('Fábio'),             data:'2026-04-10', tipo:'fechamento', nomeCliente:'',                             cidadeEstado:'',                    numUnidades:1, valorGestao:0,    ednId:null },
     ].filter(e => e.vendedorId);
 
-    this._cache.eventos.push(..._evAbr);
+    const _evAbrNovos = _evAbr.filter(e => e.vendedorId && !_idsExistentes.has(e.id));
+    this._cache.eventos.push(..._evAbrNovos);
 
     /* Migração 10b: Garante últimos fechamentos do mês na barra inferior do Q3 */
     if (!this._cache.ultimos_fechamentos || this._cache.ultimos_fechamentos.length === 0) {
