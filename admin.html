@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Administrador — Velocidade da Lux</title>
+<style>
+/* ── RESET & BASE ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:        #0d1b2a;
+  --bg2:       #112236;
+  --bg3:       #16304a;
+  --border:    #1e3a54;
+  --accent:    #7fff00;
+  --accent2:   #4fc3f7;
+  --text:      #e0eaf4;
+  --text2:     #8aafc8;
+  --danger:    #ff4d4d;
+  --warning:   #ffb300;
+  --success:   #7fff00;
+  --sidebar-w: 220px;
+  --radius:    8px;
+  --font:      'Segoe UI', system-ui, sans-serif;
+}
+body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ── LAYOUT ── */
+.app { display: flex; flex: 1; min-height: 100vh; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w); background: var(--bg2); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; z-index: 100;
+}
+.sidebar-logo { padding: 20px 16px 12px; border-bottom: 1px solid var(--border); }
+.sidebar-logo .brand { font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; }
+.sidebar-logo .sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+.nav-group { padding: 8px 0; border-bottom: 1px solid var(--border); }
+.nav-group-label { font-size: 10px; font-weight: 700; color: var(--text2); letter-spacing: 1.5px; text-transform: uppercase; padding: 6px 16px 4px; }
+.nav-btn {
+  display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 16px;
+  background: none; border: none; color: var(--text2); font-size: 13px; cursor: pointer;
+  text-align: left; transition: background .15s, color .15s; border-left: 3px solid transparent;
+}
+.nav-btn:hover { background: var(--bg3); color: var(--text); }
+.nav-btn.active { background: var(--bg3); color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+.nav-btn .icon { font-size: 15px; width: 18px; text-align: center; }
+
+.sidebar-token { padding: 12px 16px; margin-top: auto; border-top: 1px solid var(--border); }
+.token-label { font-size: 10px; color: var(--text2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+.token-row { display: flex; gap: 6px; }
+.token-input { flex: 1; background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: var(--radius); padding: 6px 8px; font-size: 12px; }
+.token-input:focus { outline: none; border-color: var(--accent2); }
+.token-save { background: var(--accent2); color: var(--bg); border: none; border-radius: var(--radius); padding: 6px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.token-status { font-size: 11px; margin-top: 5px; }
+.token-status.ok { color: var(--success); }
+.token-status.err { color: var(--danger); }
+.token-status.idle { color: var(--text2); }
+
+/* ── MAIN ── */
+.main { margin-left: var(--sidebar-w); flex: 1; padding: 28px 32px; max-width: 1000px; }
+
+/* ── SECTION ── */
+.section { display: none; }
+.section.active { display: block; }
+.section-title { font-size: 20px; font-weight: 700; color: var(--accent); margin-bottom: 4px; letter-spacing: .5px; }
+.section-sub { font-size: 13px; color: var(--text2); margin-bottom: 24px; }
+
+/* ── CARDS ── */
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
+.card-title { font-size: 13px; font-weight: 700; color: var(--accent2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+
+/* ── FORMS ── */
+.form-grid { display: grid; gap: 12px; }
+.form-grid-2 { grid-template-columns: 1fr 1fr; }
+.form-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: .8px; }
+.form-group input, .form-group select, .form-group textarea {
+  background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+  border-radius: var(--radius); padding: 9px 12px; font-size: 13px; font-family: var(--font);
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent2); }
+.form-group select option { background: var(--bg3); }
+.form-check { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; margin-top: 6px; }
+.form-check input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+
+/* ── BUTTONS ── */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border: none; border-radius: var(--radius); font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity .15s; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn-primary { background: var(--accent); color: var(--bg); }
+.btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+.btn-icon { padding: 5px 8px; font-size: 14px; background: var(--bg3); border: 1px solid var(--border); color: var(--text2); border-radius: 6px; cursor: pointer; }
+.btn-icon:hover { color: var(--danger); border-color: var(--danger); }
+.btn-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; align-items: center; }
+
+/* ── TABLES ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th { font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .8px; padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+tbody td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tbody tr:hover { background: var(--bg3); }
+tbody tr:last-child td { border-bottom: none; }
+.td-actions { display: flex; gap: 6px; }
+.badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; letter-spacing: .5px; }
+.badge-edn { background: #1a3a5c; color: var(--accent2); }
+.badge-exec { background: #2a1a1a; color: #ff8a65; }
+.badge-ambos { background: #1a2a1a; color: var(--accent); }
+.badge-hidden { background: #2a2a1a; color: var(--warning); }
+.badge-protected { background: #2a1a3a; color: #ce93d8; }
+
+/* ── STATUS BOXES ── */
+.status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px; }
+.stat-box { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.stat-box .val { font-size: 28px; font-weight: 700; color: var(--accent); }
+.stat-box .lbl { font-size: 11px; color: var(--text2); margin-top: 4px; }
+.status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.status-dot.green { background: var(--success); box-shadow: 0 0 6px var(--success); }
+.status-dot.red { background: var(--danger); }
+.status-dot.yellow { background: var(--warning); }
+
+/* ── TOAST ── */
+#toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 9999; }
+.toast { display: flex; align-items: center; gap: 10px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 18px; font-size: 13px; min-width: 260px; box-shadow: 0 4px 20px rgba(0,0,0,.4); animation: slideIn .2s ease; }
+.toast.success { border-left: 3px solid var(--success); }
+.toast.error { border-left: 3px solid var(--danger); }
+.toast.info { border-left: 3px solid var(--accent2); }
+@keyframes slideIn { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* ── DIVIDER ── */
+.divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+/* ── EMPTY STATE ── */
+.empty { text-align: center; padding: 32px; color: var(--text2); font-size: 13px; }
+
+/* ── MODAL ── */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 500; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; width: 480px; max-width: 95vw; max-height: 90vh; overflow-y: auto; }
+.modal-title { font-size: 16px; font-weight: 700; color: var(--accent); margin-bottom: 20px; }
+.modal-close { float: right; background: none; border: none; color: var(--text2); font-size: 20px; cursor: pointer; margin-top: -4px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ═══════════════════════════════════════ SIDEBAR ═══════════════════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="brand">⚡ Velocidade da Lux</div>
+      <div class="sub">Painel Administrador</div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Visão Geral</div>
+      <button class="nav-btn active" data-sec="status"><span class="icon">📡</span> Status</button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Equipe</div>
+      <button class="nav-btn" data-sec="equipe"><span class="icon">👥</span> Vendedores</button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Lançamentos</div>
+      <button class="nav-btn" data-sec="reunioes"><span class="icon">📅</span> Reuniões</button>
+      <button class="nav-btn" data-sec="fechamentos"><span class="icon">🤝</span> Fechamentos</button>
+      <button class="nav-btn" data-sec="ticker"><span class="icon">🏆</span> Últimos Fechamentos</button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Configurações</div>
+      <button class="nav-btn" data-sec="metas"><span class="icon">🎯</span> Metas</button>
+      <button class="nav-btn" data-sec="historico"><span class="icon">📊</span> Histórico 2026</button>
+      <button class="nav-btn" data-sec="destaques"><span class="icon">⭐</span> Destaques Mês Ant.</button>
+      <button class="nav-btn" data-sec="projecao"><span class="icon">📈</span> Projeção</button>
+    </div>
+
+    <div class="sidebar-token">
+      <div class="token-label">Token GitHub</div>
+      <div class="token-row">
+        <input id="token-input" class="token-input" type="password" placeholder="ghp_..." autocomplete="off"/>
+        <button class="token-save" onclick="Admin.salvarToken()">✓</button>
+      </div>
+      <div id="token-status" class="token-status idle">Não configurado</div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════════ MAIN ═══════════════════════════════════════ -->
+  <main class="main">
+
+    <!-- ── STATUS ── -->
+    <section id="sec-status" class="section active">
+      <div class="section-title">Status da Conexão</div>
+      <div class="section-sub">Verifique a sincronização com o Gist e o estado atual dos dados.</div>
+      <div class="status-grid">
+        <div class="stat-box"><div class="val" id="st-token">—</div><div class="lbl">Token GitHub</div></div>
+        <div class="stat-box"><div class="val" id="st-sync">—</div><div class="lbl">Último sync</div></div>
+        <div class="stat-box"><div class="val" id="st-equipe">—</div><div class="lbl">Vendedores cadastrados</div></div>
+        <div class="stat-box"><div class="val" id="st-eventos">—</div><div class="lbl">Eventos no mês atual</div></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="Admin.recarregarGist()">🔄 Recarregar do Gist</button>
+        <button class="btn btn-secondary" onclick="window.open('index.html','_blank')">👁 Abrir Telão</button>
+      </div>
+      <hr class="divider"/>
+      <div class="card">
+        <div class="card-title">Instruções rápidas</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7">
+          1. Cole seu <strong>Token GitHub</strong> no campo abaixo à esquerda e clique em ✓<br/>
+          2. Aguarde a confirmação verde <em>"Conectado"</em><br/>
+          3. Use o menu lateral para lançar reuniões, fechamentos e editar configurações<br/>
+          4. Cada alteração salva é enviada ao Gist e aparece no telão em até <strong>20 segundos</strong>
+        </p>
+      </div>
+    </section>
+
+    <!-- ── EQUIPE ── -->
+    <section id="sec-equipe" class="section">
+      <div class="section-title">Vendedores</div>
+      <div class="section-sub">Gerencie EDNs, Executivos e membros com ambos os perfis.</div>
+
+      <div class="card">
+        <div class="card-title" id="equipe-form-title">Adicionar Vendedor</div>
+        <div class="form-grid form-grid-3">
+          <div class="form-group"><label>Nome *</label><input id="eq-nome" type="text" placeholder="Ex: João"/></div>
+          <div class="form-group"><label>Sobrenome</label><input id="eq-sobrenome" type="text" placeholder="Ex: Silva"/></div>
+          <div class="form-group"><label>Perfil *</label>
+            <select id="eq-perfil">
+              <option value="EDN">EDN</option>
+              <option value="Executivo">Executivo</option>
+              <option value="Ambos">Ambos (EDN + Executivo)</option>
+            </select>
+          </div>
+        </div>
+        <label class="form-check"><input id="eq-ocultar" type="checkbox"/> Ocultar do Telão (conta nos gráficos, não aparece no ranking)</label>
+        <input id="eq-edit-id" type="hidden" value=""/>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="Admin.salvarVendedor()">💾 Salvar Vendedor</button>
+          <button class="btn btn-secondary" id="eq-cancel-btn" style="display:none" onclick="Admin.cancelarEdicaoVendedor()">Cancelar</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Equipe Atual</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nome</th><th>Perfil</th><th>Visibilidade</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody id="equipe-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── REUNIÕES ── -->
+    <section id="sec-reunioes" class="section">
+      <div class="section-title">Reuniões Realizadas</div>
+      <div class="section-sub">Lance reuniões do mês atual. Meses anteriores são editados em <em>Histórico 2026</em>.</div>
+
+      <div style="display:grid;grid-template-columns:320px 1fr;gap:20px;align-items:start">
+        <div class="card">
+          <div class="card-title">Nova Reunião</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Vendedor (EDN) *</label>
+              <select id="reun-vendedor"></select>
+            </div>
+            <div class="form-group"><label>Data *</label><input id="reun-data" type="date"/></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" onclick="Admin.adicionarReuniao()">+ Adicionar</button></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Reuniões do Mês Atual <span id="reun-mes-label" style="color:var(--text2);font-weight:400;font-size:11px"></span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Vendedor</th><th>Data</th><th></th></tr></thead>
+              <tbody id="reunioes-tbody"></tbody>
+            </table>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:16px;flex-wrap:wrap" id="reun-totais"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FECHAMENTOS ── -->
+    <section id="sec-fechamentos" class="section">
+      <div class="section-title">Fechamentos</div>
+      <div class="section-sub">Registre contratos fechados no mês atual.</div>
+
+      <div class="card">
+        <div class="card-title" id="fech-form-title">Novo Fechamento</div>
+        <div class="form-grid form-grid-2">
+          <div class="form-group"><label>Executivo *</label><select id="fech-exec"></select></div>
+          <div class="form-group"><label>EDN que Prospectou</label><select id="fech-edn"></select></div>
+          <div class="form-group"><label>Nome do Cliente *</label><input id="fech-cliente" type="text" placeholder="Ex: Empresa ABC"/></div>
+          <div class="form-group"><label>Cidade / Estado</label><input id="fech-cidade" type="text" placeholder="Ex: São Paulo / SP"/></div>
+          <div class="form-group"><label>Nº de Unidades</label><input id="fech-unidades" type="number" min="1" value="1"/></div>
+          <div class="form-group"><label>Valor de Gestão (R$)</label><input id="fech-valor" type="number" min="0" step="100" placeholder="0"/></div>
+          <div class="form-group"><label>Data do Fechamento *</label><input id="fech-data" type="date"/></div>
+        </div>
+        <input id="fech-edit-id" type="hidden" value=""/>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="Admin.salvarFechamento()">💾 Salvar Fechamento</button>
+          <button class="btn btn-secondary" id="fech-cancel-btn" style="display:none" onclick="Admin.cancelarEdicaoFechamento()">Cancelar</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Fechamentos do Mês Atual</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Data</th><th>Executivo</th><th>EDN</th><th>Cliente</th><th>Unidades</th><th>Valor</th><th>Ações</th></tr></thead>
+            <tbody id="fechamentos-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── TICKER ── -->
+    <section id="sec-ticker" class="section">
+      <div class="section-title">Últimos Fechamentos do Mês</div>
+      <div class="section-sub">Controle os cards exibidos na faixa inferior do telão.</div>
+
+      <div class="card">
+        <div class="card-title">Adicionar / Editar</div>
+        <div class="form-grid form-grid-2">
+          <div class="form-group"><label>Cliente *</label><input id="tick-cliente" type="text" placeholder="Nome do cliente"/></div>
+          <div class="form-group"><label>Executivo *</label><input id="tick-exec" type="text" placeholder="Nome do executivo"/></div>
+          <div class="form-group"><label>Valor de Gestão (R$) *</label><input id="tick-valor" type="number" min="0" step="100"/></div>
+          <div class="form-group"><label>Data (DD/MM/AAAA) *</label><input id="tick-data" type="text" placeholder="15/04/2026" maxlength="10"/></div>
+        </div>
+        <input id="tick-edit-idx" type="hidden" value=""/>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="Admin.salvarTicker()">💾 Salvar</button>
+          <button class="btn btn-secondary" id="tick-cancel-btn" style="display:none" onclick="Admin.cancelarEdicaoTicker()">Cancelar</button>
+          <button class="btn btn-secondary" onclick="Admin.autoPopularTicker()">⚡ Auto-popular dos fechamentos</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Cards no Telão <span style="color:var(--text2);font-weight:400;font-size:11px">(ordem importa — os primeiros aparecem primeiro)</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Cliente</th><th>Executivo</th><th>Valor</th><th>Data</th><th>Ações</th></tr></thead>
+            <tbody id="ticker-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── METAS ── -->
+    <section id="sec-metas" class="section">
+      <div class="section-title">Metas do Mês</div>
+      <div class="section-sub">Defina os alvos que aparecem no quadrante "Meta do Mês" do telão.</div>
+
+      <div class="card">
+        <div class="form-grid form-grid-2">
+          <div class="form-group">
+            <label>Meta de Reuniões por EDN</label>
+            <input id="meta-reun" type="number" min="0" placeholder="Ex: 12"/>
+            <span style="font-size:11px;color:var(--text2);margin-top:4px" id="meta-reun-total"></span>
+          </div>
+          <div class="form-group">
+            <label>Meta de Fechamentos por Executivo</label>
+            <input id="meta-fech" type="number" min="0" placeholder="Ex: 3"/>
+            <span style="font-size:11px;color:var(--text2);margin-top:4px" id="meta-fech-total"></span>
+          </div>
+        </div>
+        <div class="btn-row"><button class="btn btn-primary" onclick="Admin.salvarMetas()">💾 Salvar Metas</button></div>
+      </div>
+    </section>
+
+    <!-- ── HISTÓRICO 2026 ── -->
+    <section id="sec-historico" class="section">
+      <div class="section-title">Histórico 2026</div>
+      <div class="section-sub">Edite os valores de meses já encerrados que aparecem no gráfico comparativo.</div>
+
+      <div class="card">
+        <div class="card-title">Meses Encerrados (Jan – Mês Anterior)</div>
+        <div class="table-wrap" id="historico-table-wrap">
+          <!-- gerado por JS -->
+        </div>
+        <div class="btn-row"><button class="btn btn-primary" onclick="Admin.salvarHistorico()">💾 Salvar Histórico</button></div>
+      </div>
+
+      <div class="card" style="border-color:var(--warning)22">
+        <div style="font-size:12px;color:var(--text2);line-height:1.6">
+          ⚠️ <strong style="color:var(--warning)">Atenção:</strong> Os dados de Jan, Fev e Mar têm valores mínimos protegidos pelo telão
+          (Reuniões: 21, 32, 36 | Fechamentos: 10, 0, 2). Se salvar valores menores, o telão usará os valores reais.
+        </div>
+      </div>
+    </section>
+
+    <!-- ── DESTAQUES ── -->
+    <section id="sec-destaques" class="section">
+      <div class="section-title">Destaques do Mês Anterior</div>
+      <div class="section-sub">Defina (ou auto-calcule) os campeões de reuniões, fechamentos e receita do mês passado.</div>
+
+      <div class="card">
+        <div class="form-grid" style="margin-bottom:16px">
+          <div class="form-group"><label>Mês de Referência</label><input id="dest-mes" type="text" placeholder="Ex: Março 2026"/></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+          <div>
+            <div style="font-size:11px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🏅 Mais Reuniões</div>
+            <div class="form-group"><label>Nome</label><input id="dest-reun-nome" type="text"/></div>
+            <div class="form-group" style="margin-top:8px"><label>Quantidade</label><input id="dest-reun-val" type="number" min="0"/></div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🏆 Mais Fechamentos</div>
+            <div class="form-group"><label>Nome</label><input id="dest-fech-nome" type="text"/></div>
+            <div class="form-group" style="margin-top:8px"><label>Quantidade</label><input id="dest-fech-val" type="number" min="0"/></div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">💰 Maior Receita</div>
+            <div class="form-group"><label>Nome</label><input id="dest-rec-nome" type="text"/></div>
+            <div class="form-group" style="margin-top:8px"><label>Valor (R$)</label><input id="dest-rec-val" type="number" min="0"/></div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="Admin.salvarDestaques()">💾 Salvar Destaques</button>
+          <button class="btn btn-secondary" onclick="Admin.autoCalcularDestaques()">⚡ Auto-calcular do mês anterior</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PROJEÇÃO ── -->
+    <section id="sec-projecao" class="section">
+      <div class="section-title">Projeção de Fechamentos</div>
+      <div class="section-sub">Visualização do cálculo automático baseado nas reuniões realizadas.</div>
+
+      <div class="card">
+        <div class="card-title">Fórmula Ativa</div>
+        <div style="font-size:14px;line-height:1.8;color:var(--text2)">
+          A projeção de fechamentos é calculada automaticamente como <strong style="color:var(--accent)">20%</strong>
+          das reuniões realizadas <strong style="color:var(--accent)">2 meses antes</strong>.<br/>
+          Janeiro e Fevereiro não têm projeção (início do ano sem histórico suficiente).
+        </div>
+        <div style="margin-top:16px;padding:12px 16px;background:var(--bg3);border-radius:var(--radius);font-family:monospace;font-size:13px;color:var(--accent2)">
+          Projeção(mês) = Reuniões(mês - 2) × 0,20
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Tabela de Projeção 2026</div>
+        <div class="table-wrap" id="projecao-table-wrap">
+          <!-- gerado por JS -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- MODAL genérico -->
+<div id="modal-overlay" class="modal-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="Admin.fecharModal()">×</button>
+    <div class="modal-title" id="modal-title">Confirmação</div>
+    <div id="modal-body" style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px"></div>
+    <div class="btn-row" id="modal-btns"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast-container"></div>
+
+<!-- ═══════════════════════════════════════ SCRIPT ═══════════════════════════════════════ -->
+<script>
+/* ====================================================================
+   CONSTANTES
+   ==================================================================== */
+const GIST_ID = '5a54b0044992dc5954d032995be46431';
+const MESES   = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const MESES_FULL = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+/* Membros protegidos pelas migrações do telão — não podem ser removidos */
+const PROTEGIDOS = ['Bianca','Caio','Giovanna','Jhonatas','Gabriel Veiga','Lorenzo','Brenda','Brunno','Luana','Vanessa','Gabriel Gracia','Fábio'];
+
+/* ====================================================================
+   GIST SERVICE
+   ==================================================================== */
+const GistService = {
+  _data: null,
+  _debounce: null,
+  _saving: false,
+
+  getToken() { return localStorage.getItem('lux_gh_token') || ''; },
+  setToken(t) { localStorage.setItem('lux_gh_token', t.trim()); },
+
+  _headers() {
+    return {
+      'Authorization': `token ${this.getToken()}`,
+      'Content-Type':  'application/json',
+      'Accept':        'application/vnd.github.v3+json',
+    };
+  },
+
+  async validateToken() {
+    try {
+      const r = await fetch('https://api.github.com/user', { headers: this._headers() });
+      return r.ok;
+    } catch { return false; }
+  },
+
+  async load() {
+    const r = await fetch(`https://api.github.com/gists/${GIST_ID}`, { headers: this._headers() });
+    if (!r.ok) throw new Error(`Gist load: HTTP ${r.status}`);
+    const gist = await r.json();
+    const raw  = Object.values(gist.files)[0]?.content || '{}';
+    this._data = JSON.parse(raw);
+    this._ensureStructure();
+    return this._data;
+  },
+
+  _ensureStructure() {
+    const d = this._data;
+    if (!Array.isArray(d.equipe))             d.equipe = [];
+    if (!Array.isArray(d.eventos))            d.eventos = [];
+    if (!d.metas)                             d.metas = { reunioesPorEDN: 12, fechamentosExecutivo: 3 };
+    if (!d.destaques_anterior)                d.destaques_anterior = { mes: '', reunioes: null, fechamentos: null, receita: null };
+    if (!Array.isArray(d.ultimos_fechamentos)) d.ultimos_fechamentos = [];
+    if (!d.historico_2026)                    d.historico_2026 = { reunioes: Array(12).fill(0), fechamentos: Array(12).fill(0) };
+  },
+
+  getData() { return this._data || {}; },
+
+  async save() {
+    clearTimeout(this._debounce);
+    this._debounce = setTimeout(() => this._doSave(), 1500);
+  },
+
+  async saveNow() { clearTimeout(this._debounce); await this._doSave(); },
+
+  async _doSave() {
+    if (this._saving) return;
+    this._saving = true;
+    try {
+      /* Recarrega do Gist antes de salvar para evitar conflitos */
+      const fresh = await fetch(`https://api.github.com/gists/${GIST_ID}`, { headers: this._headers() });
+      if (fresh.ok) {
+        const gist = await fresh.json();
+        const raw  = Object.values(gist.files)[0]?.content || '{}';
+        const remote = JSON.parse(raw);
+        /* Mantém nossos dados sobre o remoto */
+        this._data = { ...remote, ...this._data };
+      }
+
+      const body = JSON.stringify({
+        files: { 'lux_data.json': { content: JSON.stringify(this._data) } }
+      });
+      const r = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+        method: 'PATCH', headers: this._headers(), body
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      Admin.toast('Salvo no Gist ✓', 'success');
+      Admin.atualizarStatus();
+    } catch(e) {
+      Admin.toast(`Erro ao salvar: ${e.message}`, 'error');
+    } finally {
+      this._saving = false;
+    }
+  },
+
+  uid() { return '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); },
+
+  mesAtualStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  },
+
+  eventosMesAtual() {
+    const mes = this.mesAtualStr();
+    return (this._data?.eventos || []).filter(e => e.data && e.data.startsWith(mes));
+  },
+};
+
+/* ====================================================================
+   ADMIN CONTROLLER
+   ==================================================================== */
+const Admin = {
+
+  /* ── INIT ── */
+  async init() {
+    this.bindNav();
+    this.setDataDefaults();
+    const token = GistService.getToken();
+    if (token) {
+      document.getElementById('token-input').value = '••••••••••••••••••';
+      await this.conectar(token, false);
+    } else {
+      this.setTokenStatus('idle', 'Não configurado');
+    }
+  },
+
+  bindNav() {
+    document.querySelectorAll('.nav-btn[data-sec]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById('sec-' + btn.dataset.sec).classList.add('active');
+        this.renderSecao(btn.dataset.sec);
+      });
+    });
+  },
+
+  setDataDefaults() {
+    document.getElementById('reun-data').valueAsDate = new Date();
+    document.getElementById('fech-data').valueAsDate = new Date();
+  },
+
+  /* ── TOKEN ── */
+  async salvarToken() {
+    const t = document.getElementById('token-input').value.trim();
+    if (!t || t.startsWith('•')) { this.toast('Cole um token válido', 'error'); return; }
+    GistService.setToken(t);
+    await this.conectar(t, true);
+  },
+
+  async conectar(token, feedback) {
+    this.setTokenStatus('idle', 'Verificando...');
+    const ok = await GistService.validateToken();
+    if (!ok) { this.setTokenStatus('err', 'Token inválido (401)'); if (feedback) this.toast('Token inválido', 'error'); return; }
+    this.setTokenStatus('ok', 'Conectado ✓');
+    try {
+      await GistService.load();
+      this.atualizarStatus();
+      this.renderSecaoAtiva();
+      if (feedback) this.toast('Conectado e dados carregados!', 'success');
+    } catch(e) {
+      this.setTokenStatus('err', 'Erro ao carregar Gist');
+      this.toast('Erro ao carregar Gist: ' + e.message, 'error');
+    }
+  },
+
+  setTokenStatus(tipo, msg) {
+    const el = document.getElementById('token-status');
+    el.className = `token-status ${tipo}`;
+    el.textContent = msg;
+    document.getElementById('st-token').textContent = tipo === 'ok' ? '✅' : tipo === 'err' ? '❌' : '—';
+  },
+
+  async recarregarGist() {
+    try {
+      await GistService.load();
+      this.atualizarStatus();
+      this.renderSecaoAtiva();
+      this.toast('Dados recarregados!', 'success');
+    } catch(e) { this.toast('Erro: ' + e.message, 'error'); }
+  },
+
+  /* ── STATUS ── */
+  atualizarStatus() {
+    const d = GistService.getData();
+    document.getElementById('st-sync').textContent    = new Date().toLocaleTimeString('pt-BR');
+    document.getElementById('st-equipe').textContent  = (d.equipe || []).length;
+    document.getElementById('st-eventos').textContent = GistService.eventosMesAtual().length;
+  },
+
+  renderSecaoAtiva() {
+    const btn = document.querySelector('.nav-btn.active');
+    if (btn) this.renderSecao(btn.dataset.sec);
+  },
+
+  renderSecao(sec) {
+    const map = {
+      status:      () => this.atualizarStatus(),
+      equipe:      () => this.renderEquipe(),
+      reunioes:    () => { this.renderSelectVendedores(); this.renderReunioes(); },
+      fechamentos: () => { this.renderSelectsExecEdn(); this.renderFechamentos(); },
+      ticker:      () => this.renderTicker(),
+      metas:       () => this.renderMetas(),
+      historico:   () => this.renderHistorico(),
+      destaques:   () => this.renderDestaques(),
+      projecao:    () => this.renderProjecao(),
+    };
+    map[sec]?.();
+  },
+
+  /* ── HELPERS ── */
+  getVendedorById(id) { return (GistService.getData().equipe || []).find(v => v.id === id) || null; },
+  nomeVendedor(id)    { const v = this.getVendedorById(id); return v ? `${v.nome}${v.sobrenome ? ' '+v.sobrenome : ''}` : '—'; },
+  isProtegido(v)      { return PROTEGIDOS.includes(v.nome) || PROTEGIDOS.includes(`${v.nome} ${v.sobrenome}`); },
+
+  fmtReal(v) { return `R$ ${Number(v || 0).toLocaleString('pt-BR')}`; },
+
+  /* ── EQUIPE ── */
+  renderEquipe() {
+    const equipe = GistService.getData().equipe || [];
+    const tbody  = document.getElementById('equipe-tbody');
+    if (!equipe.length) { tbody.innerHTML = `<tr><td colspan="5" class="empty">Nenhum vendedor cadastrado</td></tr>`; return; }
+
+    tbody.innerHTML = equipe.map(v => {
+      const nome     = `${v.nome}${v.sobrenome ? ' '+v.sobrenome : ''}`;
+      const proteg   = this.isProtegido(v);
+      const perfBadge = { EDN: 'badge-edn', Executivo: 'badge-exec', Ambos: 'badge-ambos' }[v.perfil] || '';
+      return `<tr>
+        <td>${nome} ${proteg ? '<span class="badge badge-protected">🔒 protegido</span>' : ''}</td>
+        <td><span class="badge ${perfBadge}">${v.perfil}</span></td>
+        <td>${v.ocultarTelao ? '<span class="badge badge-hidden">oculto</span>' : '<span style="color:var(--text2);font-size:12px">visível</span>'}</td>
+        <td><span class="status-dot ${proteg ? 'green' : 'yellow'}"></span>${proteg ? 'Ativo' : 'Manual'}</td>
+        <td class="td-actions">
+          <button class="btn-icon" title="Editar" onclick="Admin.editarVendedor('${v.id}')">✏️</button>
+          <button class="btn-icon" title="Remover" onclick="Admin.removerVendedor('${v.id}')">🗑️</button>
+        </td>
+      </tr>`;
+    }).join('');
+  },
+
+  salvarVendedor() {
+    const nome     = document.getElementById('eq-nome').value.trim();
+    const sobrenome = document.getElementById('eq-sobrenome').value.trim();
+    const perfil   = document.getElementById('eq-perfil').value;
+    const ocultar  = document.getElementById('eq-ocultar').checked;
+    const editId   = document.getElementById('eq-edit-id').value;
+
+    if (!nome) { this.toast('Nome obrigatório', 'error'); return; }
+
+    const d = GistService.getData();
+    if (editId) {
+      const v = d.equipe.find(x => x.id === editId);
+      if (v) { v.nome = nome; v.sobrenome = sobrenome; v.perfil = perfil; v.ocultarTelao = ocultar || undefined; }
+    } else {
+      d.equipe.push({ id: GistService.uid(), nome, sobrenome, perfil, ocultarTelao: ocultar || undefined, foto: null });
+    }
+    this.cancelarEdicaoVendedor();
+    this.renderEquipe();
+    GistService.save();
+    this.toast(editId ? 'Vendedor atualizado!' : 'Vendedor adicionado!', 'success');
+  },
+
+  editarVendedor(id) {
+    const v = this.getVendedorById(id);
+    if (!v) return;
+    document.getElementById('eq-nome').value      = v.nome;
+    document.getElementById('eq-sobrenome').value = v.sobrenome || '';
+    document.getElementById('eq-perfil').value    = v.perfil;
+    document.getElementById('eq-ocultar').checked = !!v.ocultarTelao;
+    document.getElementById('eq-edit-id').value   = id;
+    document.getElementById('equipe-form-title').textContent = 'Editar Vendedor';
+    document.getElementById('eq-cancel-btn').style.display = '';
+    document.getElementById('eq-nome').focus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  cancelarEdicaoVendedor() {
+    document.getElementById('eq-nome').value      = '';
+    document.getElementById('eq-sobrenome').value = '';
+    document.getElementById('eq-perfil').value    = 'EDN';
+    document.getElementById('eq-ocultar').checked = false;
+    document.getElementById('eq-edit-id').value   = '';
+    document.getElementById('equipe-form-title').textContent = 'Adicionar Vendedor';
+    document.getElementById('eq-cancel-btn').style.display = 'none';
+  },
+
+  removerVendedor(id) {
+    const v = this.getVendedorById(id);
+    if (!v) return;
+    const nome = `${v.nome}${v.sobrenome ? ' '+v.sobrenome : ''}`;
+    const proteg = this.isProtegido(v);
+    const d = GistService.getData();
+    const eventosDoVendedor = (d.eventos || []).filter(e => e.vendedorId === id).length;
+    let aviso = proteg ? `⚠️ <strong>${nome}</strong> é protegido pelas migrações do telão e será reinserido automaticamente.<br/><br/>` : '';
+    aviso += `Tem certeza que deseja remover <strong>${nome}</strong>?`;
+    if (eventosDoVendedor > 0) aviso += `<br/><br/>Este vendedor possui <strong>${eventosDoVendedor} eventos</strong> registrados. Os eventos serão mantidos.`;
+
+    this.abrirModal('Remover Vendedor', aviso, [
+      { label: 'Cancelar', classe: 'btn-secondary', fn: () => this.fecharModal() },
+      { label: 'Remover', classe: 'btn-danger', fn: () => {
+        d.equipe = d.equipe.filter(x => x.id !== id);
+        this.renderEquipe();
+        GistService.save();
+        this.toast(`${nome} removido`, 'info');
+        this.fecharModal();
+      }},
+    ]);
+  },
+
+  /* ── REUNIÕES ── */
+  renderSelectVendedores() {
+    const eq  = (GistService.getData().equipe || []).filter(v => v.perfil === 'EDN' || v.perfil === 'Ambos');
+    const sel = document.getElementById('reun-vendedor');
+    sel.innerHTML = eq.map(v => `<option value="${v.id}">${v.nome}${v.sobrenome ? ' '+v.sobrenome : ''}</option>`).join('');
+  },
+
+  renderReunioes() {
+    const mes   = GistService.mesAtualStr();
+    const [ano, m] = mes.split('-');
+    document.getElementById('reun-mes-label').textContent = `— ${MESES_FULL[+m-1]} ${ano}`;
+
+    const eventos = GistService.eventosMesAtual().filter(e => e.tipo === 'reuniao_realizada');
+    const tbody   = document.getElementById('reunioes-tbody');
+    if (!eventos.length) { tbody.innerHTML = `<tr><td colspan="3" class="empty">Nenhuma reunião registrada neste mês</td></tr>`; return; }
+
+    tbody.innerHTML = [...eventos].sort((a,b)=>a.data.localeCompare(b.data)).map(e => `<tr>
+      <td>${this.nomeVendedor(e.vendedorId)}</td>
+      <td>${e.data.split('-').reverse().join('/')}</td>
+      <td><button class="btn-icon" onclick="Admin.removerEvento('${e.id}','reunioes')">🗑️</button></td>
+    </tr>`).join('');
+
+    /* Totais por vendedor */
+    const totais = {};
+    eventos.forEach(e => { totais[e.vendedorId] = (totais[e.vendedorId] || 0) + 1; });
+    document.getElementById('reun-totais').innerHTML = Object.entries(totais)
+      .sort((a,b)=>b[1]-a[1])
+      .map(([id, n]) => `<span style="font-size:12px;background:var(--bg3);padding:4px 10px;border-radius:20px;color:var(--text2)"><strong style="color:var(--accent)">${n}</strong> ${this.nomeVendedor(id)}</span>`)
+      .join('');
+  },
+
+  adicionarReuniao() {
+    const vendedorId = document.getElementById('reun-vendedor').value;
+    const data       = document.getElementById('reun-data').value;
+    if (!vendedorId || !data) { this.toast('Preencha vendedor e data', 'error'); return; }
+
+    const d = GistService.getData();
+    d.eventos.push({ id: GistService.uid(), vendedorId, data, tipo: 'reuniao_realizada' });
+    this.renderReunioes();
+    GistService.save();
+    this.toast('Reunião adicionada!', 'success');
+  },
+
+  removerEvento(id, secao) {
+    const d = GistService.getData();
+    d.eventos = d.eventos.filter(e => e.id !== id);
+    if (secao === 'reunioes') this.renderReunioes();
+    else this.renderFechamentos();
+    GistService.save();
+    this.toast('Evento removido', 'info');
+  },
+
+  /* ── FECHAMENTOS ── */
+  renderSelectsExecEdn() {
+    const eq   = GistService.getData().equipe || [];
+    const execs = eq.filter(v => v.perfil === 'Executivo' || v.perfil === 'Ambos');
+    const edns  = eq.filter(v => v.perfil === 'EDN' || v.perfil === 'Ambos');
+
+    const selE = document.getElementById('fech-exec');
+    selE.innerHTML = execs.map(v => `<option value="${v.id}">${v.nome}${v.sobrenome?' '+v.sobrenome:''}</option>`).join('');
+
+    const selD = document.getElementById('fech-edn');
+    selD.innerHTML = `<option value="">— Nenhum —</option>` + edns.map(v => `<option value="${v.id}">${v.nome}${v.sobrenome?' '+v.sobrenome:''}</option>`).join('');
+  },
+
+  renderFechamentos() {
+    const fechs = GistService.eventosMesAtual().filter(e => e.tipo === 'fechamento');
+    const tbody = document.getElementById('fechamentos-tbody');
+    if (!fechs.length) { tbody.innerHTML = `<tr><td colspan="7" class="empty">Nenhum fechamento neste mês</td></tr>`; return; }
+
+    tbody.innerHTML = [...fechs].sort((a,b)=>a.data.localeCompare(b.data)).map(e => `<tr>
+      <td>${e.data.split('-').reverse().join('/')}</td>
+      <td>${this.nomeVendedor(e.vendedorId)}</td>
+      <td>${e.ednId ? this.nomeVendedor(e.ednId) : '—'}</td>
+      <td>${e.nomeCliente || '—'}</td>
+      <td>${e.numUnidades || 1}</td>
+      <td>${this.fmtReal(e.valorGestao)}</td>
+      <td class="td-actions">
+        <button class="btn-icon" onclick="Admin.editarFechamento('${e.id}')">✏️</button>
+        <button class="btn-icon" onclick="Admin.removerEvento('${e.id}','fechamentos')">🗑️</button>
+      </td>
+    </tr>`).join('');
+  },
+
+  salvarFechamento() {
+    const vendedorId  = document.getElementById('fech-exec').value;
+    const ednId       = document.getElementById('fech-edn').value || null;
+    const nomeCliente = document.getElementById('fech-cliente').value.trim();
+    const cidadeEstado= document.getElementById('fech-cidade').value.trim();
+    const numUnidades = parseInt(document.getElementById('fech-unidades').value) || 1;
+    const valorGestao = parseFloat(document.getElementById('fech-valor').value) || 0;
+    const data        = document.getElementById('fech-data').value;
+    const editId      = document.getElementById('fech-edit-id').value;
+
+    if (!vendedorId || !nomeCliente || !data) { this.toast('Preencha Executivo, Cliente e Data', 'error'); return; }
+
+    const d = GistService.getData();
+    if (editId) {
+      const ev = d.eventos.find(e => e.id === editId);
+      if (ev) Object.assign(ev, { vendedorId, ednId, nomeCliente, cidadeEstado, numUnidades, valorGestao, data });
+    } else {
+      d.eventos.push({ id: GistService.uid(), vendedorId, ednId, nomeCliente, cidadeEstado, numUnidades, valorGestao, data, tipo: 'fechamento' });
+    }
+    this.cancelarEdicaoFechamento();
+    this.renderFechamentos();
+    GistService.save();
+    this.toast(editId ? 'Fechamento atualizado!' : 'Fechamento adicionado!', 'success');
+  },
+
+  editarFechamento(id) {
+    const d  = GistService.getData();
+    const ev = d.eventos.find(e => e.id === id);
+    if (!ev) return;
+    document.getElementById('fech-exec').value     = ev.vendedorId;
+    document.getElementById('fech-edn').value      = ev.ednId || '';
+    document.getElementById('fech-cliente').value  = ev.nomeCliente || '';
+    document.getElementById('fech-cidade').value   = ev.cidadeEstado || '';
+    document.getElementById('fech-unidades').value = ev.numUnidades || 1;
+    document.getElementById('fech-valor').value    = ev.valorGestao || 0;
+    document.getElementById('fech-data').value     = ev.data;
+    document.getElementById('fech-edit-id').value  = id;
+    document.getElementById('fech-form-title').textContent = 'Editar Fechamento';
+    document.getElementById('fech-cancel-btn').style.display = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  cancelarEdicaoFechamento() {
+    ['fech-exec','fech-edn','fech-cliente','fech-cidade','fech-unidades','fech-valor','fech-data'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el.tagName === 'SELECT') el.selectedIndex = 0;
+      else el.value = id === 'fech-unidades' ? 1 : '';
+    });
+    document.getElementById('fech-data').valueAsDate = new Date();
+    document.getElementById('fech-edit-id').value = '';
+    document.getElementById('fech-form-title').textContent = 'Novo Fechamento';
+    document.getElementById('fech-cancel-btn').style.display = 'none';
+  },
+
+  /* ── TICKER ── */
+  renderTicker() {
+    const items = GistService.getData().ultimos_fechamentos || [];
+    const tbody = document.getElementById('ticker-tbody');
+    if (!items.length) { tbody.innerHTML = `<tr><td colspan="6" class="empty">Nenhum fechamento cadastrado</td></tr>`; return; }
+
+    tbody.innerHTML = items.map((it, i) => `<tr>
+      <td style="color:var(--text2)">${i+1}</td>
+      <td>${it.cliente}</td>
+      <td>${it.executivo}</td>
+      <td>${this.fmtReal(it.valor)}</td>
+      <td>${it.data}</td>
+      <td class="td-actions">
+        <button class="btn-icon" onclick="Admin.editarTicker(${i})">✏️</button>
+        ${i > 0 ? `<button class="btn-icon" onclick="Admin.moverTicker(${i},-1)">⬆️</button>` : ''}
+        ${i < items.length-1 ? `<button class="btn-icon" onclick="Admin.moverTicker(${i},1)">⬇️</button>` : ''}
+        <button class="btn-icon" onclick="Admin.removerTicker(${i})">🗑️</button>
+      </td>
+    </tr>`).join('');
+  },
+
+  salvarTicker() {
+    const cliente  = document.getElementById('tick-cliente').value.trim();
+    const executivo= document.getElementById('tick-exec').value.trim();
+    const valor    = parseFloat(document.getElementById('tick-valor').value) || 0;
+    const data     = document.getElementById('tick-data').value.trim();
+    const editIdx  = document.getElementById('tick-edit-idx').value;
+
+    if (!cliente || !executivo || !data) { this.toast('Preencha Cliente, Executivo e Data', 'error'); return; }
+
+    const d = GistService.getData();
+    if (!Array.isArray(d.ultimos_fechamentos)) d.ultimos_fechamentos = [];
+    const item = { cliente, executivo, valor, data };
+
+    if (editIdx !== '') d.ultimos_fechamentos[+editIdx] = item;
+    else d.ultimos_fechamentos.unshift(item);
+
+    this.cancelarEdicaoTicker();
+    this.renderTicker();
+    GistService.save();
+    this.toast('Ticker atualizado!', 'success');
+  },
+
+  editarTicker(i) {
+    const it = (GistService.getData().ultimos_fechamentos || [])[i];
+    if (!it) return;
+    document.getElementById('tick-cliente').value   = it.cliente;
+    document.getElementById('tick-exec').value      = it.executivo;
+    document.getElementById('tick-valor').value     = it.valor;
+    document.getElementById('tick-data').value      = it.data;
+    document.getElementById('tick-edit-idx').value  = i;
+    document.getElementById('tick-cancel-btn').style.display = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  cancelarEdicaoTicker() {
+    ['tick-cliente','tick-exec','tick-valor','tick-data'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('tick-edit-idx').value = '';
+    document.getElementById('tick-cancel-btn').style.display = 'none';
+  },
+
+  removerTicker(i) {
+    const d = GistService.getData();
+    d.ultimos_fechamentos.splice(i, 1);
+    this.renderTicker();
+    GistService.save();
+    this.toast('Removido do ticker', 'info');
+  },
+
+  moverTicker(i, dir) {
+    const d = GistService.getData();
+    const arr = d.ultimos_fechamentos;
+    const j = i + dir;
+    if (j < 0 || j >= arr.length) return;
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+    this.renderTicker();
+    GistService.save();
+  },
+
+  autoPopularTicker() {
+    const fechs = GistService.eventosMesAtual().filter(e => e.tipo === 'fechamento');
+    if (!fechs.length) { this.toast('Nenhum fechamento no mês atual', 'error'); return; }
+    const d = GistService.getData();
+    d.ultimos_fechamentos = fechs
+      .sort((a,b) => b.data.localeCompare(a.data))
+      .map(e => ({
+        cliente:   e.nomeCliente || '—',
+        executivo: this.nomeVendedor(e.vendedorId),
+        valor:     e.valorGestao || 0,
+        data:      e.data.split('-').reverse().join('/'),
+      }));
+    this.renderTicker();
+    GistService.save();
+    this.toast('Ticker populado dos fechamentos!', 'success');
+  },
+
+  /* ── METAS ── */
+  renderMetas() {
+    const m    = GistService.getData().metas || {};
+    const edns = (GistService.getData().equipe || []).filter(v => v.perfil === 'EDN' || v.perfil === 'Ambos').length;
+    const execs= (GistService.getData().equipe || []).filter(v => v.perfil === 'Executivo' || v.perfil === 'Ambos').length;
+    document.getElementById('meta-reun').value = m.reunioesPorEDN || 12;
+    document.getElementById('meta-fech').value = m.fechamentosExecutivo || 3;
+    document.getElementById('meta-reun-total').textContent = `Com ${edns} EDNs → meta total: ${edns * (m.reunioesPorEDN||12)} reuniões`;
+    document.getElementById('meta-fech-total').textContent = `Com ${execs} Executivos → meta total: ${execs * (m.fechamentosExecutivo||3)} fechamentos`;
+  },
+
+  salvarMetas() {
+    const d = GistService.getData();
+    d.metas = {
+      reunioesPorEDN:       parseInt(document.getElementById('meta-reun').value) || 12,
+      fechamentosExecutivo: parseInt(document.getElementById('meta-fech').value) || 3,
+    };
+    this.renderMetas();
+    GistService.save();
+    this.toast('Metas salvas!', 'success');
+  },
+
+  /* ── HISTÓRICO ── */
+  renderHistorico() {
+    const mesAtual = new Date().getMonth(); // 0-based
+    const hist = GistService.getData().historico_2026 || { reunioes: Array(12).fill(0), fechamentos: Array(12).fill(0) };
+    const mesesEditaveis = MESES.slice(0, mesAtual); // apenas meses anteriores ao atual
+
+    if (!mesesEditaveis.length) {
+      document.getElementById('historico-table-wrap').innerHTML = '<p style="color:var(--text2);font-size:13px">Nenhum mês encerrado ainda.</p>';
+      return;
+    }
+
+    document.getElementById('historico-table-wrap').innerHTML = `
+      <table>
+        <thead><tr><th>Métrica</th>${mesesEditaveis.map((m,i)=>`<th>${m}</th>`).join('')}</tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600">Reuniões</td>${mesesEditaveis.map((_,i)=>`<td><input type="number" min="0" style="width:70px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 8px;font-size:13px" id="hist-reun-${i}" value="${hist.reunioes[i]||0}"/></td>`).join('')}</tr>
+          <tr><td style="font-weight:600">Fechamentos</td>${mesesEditaveis.map((_,i)=>`<td><input type="number" min="0" style="width:70px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 8px;font-size:13px" id="hist-fech-${i}" value="${hist.fechamentos[i]||0}"/></td>`).join('')}</tr>
+        </tbody>
+      </table>`;
+  },
+
+  salvarHistorico() {
+    const mesAtual = new Date().getMonth();
+    const d = GistService.getData();
+    if (!d.historico_2026) d.historico_2026 = { reunioes: Array(12).fill(0), fechamentos: Array(12).fill(0) };
+    for (let i = 0; i < mesAtual; i++) {
+      d.historico_2026.reunioes[i]    = parseInt(document.getElementById(`hist-reun-${i}`)?.value) || 0;
+      d.historico_2026.fechamentos[i] = parseInt(document.getElementById(`hist-fech-${i}`)?.value) || 0;
+    }
+    GistService.save();
+    this.toast('Histórico salvo!', 'success');
+  },
+
+  /* ── DESTAQUES ── */
+  renderDestaques() {
+    const dest = GistService.getData().destaques_anterior || {};
+    document.getElementById('dest-mes').value       = dest.mes || '';
+    document.getElementById('dest-reun-nome').value = dest.reunioes?.nome  || '';
+    document.getElementById('dest-reun-val').value  = dest.reunioes?.valor || '';
+    document.getElementById('dest-fech-nome').value = dest.fechamentos?.nome  || '';
+    document.getElementById('dest-fech-val').value  = dest.fechamentos?.valor || '';
+    document.getElementById('dest-rec-nome').value  = dest.receita?.nome  || '';
+    document.getElementById('dest-rec-val').value   = dest.receita?.valor || '';
+  },
+
+  salvarDestaques() {
+    const d = GistService.getData();
+    d.destaques_anterior = {
+      mes:         document.getElementById('dest-mes').value.trim(),
+      reunioes:    { nome: document.getElementById('dest-reun-nome').value.trim(), valor: +document.getElementById('dest-reun-val').value || 0 },
+      fechamentos: { nome: document.getElementById('dest-fech-nome').value.trim(), valor: +document.getElementById('dest-fech-val').value || 0 },
+      receita:     { nome: document.getElementById('dest-rec-nome').value.trim(),  valor: +document.getElementById('dest-rec-val').value  || 0 },
+    };
+    GistService.save();
+    this.toast('Destaques salvos!', 'success');
+  },
+
+  autoCalcularDestaques() {
+    const hoje   = new Date();
+    const mesAnt = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1);
+    const mesStr = `${mesAnt.getFullYear()}-${String(mesAnt.getMonth()+1).padStart(2,'0')}`;
+    const eventos = (GistService.getData().eventos || []).filter(e => e.data && e.data.startsWith(mesStr));
+
+    const reun = {}, fech = {}, rec = {};
+    eventos.forEach(e => {
+      if (e.tipo === 'reuniao_realizada') reun[e.vendedorId] = (reun[e.vendedorId] || 0) + 1;
+      if (e.tipo === 'fechamento') {
+        fech[e.vendedorId] = (fech[e.vendedorId] || 0) + 1;
+        rec[e.vendedorId]  = (rec[e.vendedorId]  || 0) + (e.valorGestao || 0);
+      }
+    });
+
+    const top = (obj) => Object.entries(obj).sort((a,b)=>b[1]-a[1])[0] || [null, 0];
+    const [rId, rVal] = top(reun);
+    const [fId, fVal] = top(fech);
+    const [recId, recVal] = top(rec);
+
+    document.getElementById('dest-mes').value       = `${MESES_FULL[mesAnt.getMonth()]} ${mesAnt.getFullYear()}`;
+    document.getElementById('dest-reun-nome').value = rId   ? this.nomeVendedor(rId)   : '';
+    document.getElementById('dest-reun-val').value  = rVal;
+    document.getElementById('dest-fech-nome').value = fId   ? this.nomeVendedor(fId)   : '';
+    document.getElementById('dest-fech-val').value  = fVal;
+    document.getElementById('dest-rec-nome').value  = recId ? this.nomeVendedor(recId) : '';
+    document.getElementById('dest-rec-val').value   = recVal;
+
+    if (!rId && !fId && !recId) this.toast('Nenhum evento encontrado no mês anterior', 'error');
+    else this.toast('Destaques calculados! Revise e salve.', 'info');
+  },
+
+  /* ── PROJEÇÃO ── */
+  renderProjecao() {
+    const hist26 = GistService.getData().historico_2026 || { reunioes: Array(12).fill(0), fechamentos: Array(12).fill(0) };
+    const mesAtual = new Date().getMonth();
+
+    const rows = MESES.map((m, i) => {
+      const refIdx = i - 2;
+      const refMes = refIdx >= 0 ? MESES[refIdx] : '—';
+      const reun   = refIdx >= 0 ? (hist26.reunioes[refIdx] || 0) : 0;
+      const proj   = i < 2 ? 0 : Math.round(reun * 0.20);
+      const isCurr = i === mesAtual;
+      return `<tr style="${isCurr ? 'background:var(--bg3);font-weight:700' : ''}">
+        <td>${m}${isCurr ? ' <span style="color:var(--accent);font-size:11px">◀ atual</span>' : ''}</td>
+        <td style="color:var(--text2)">${refMes}</td>
+        <td>${reun || (i < 2 ? '—' : 0)}</td>
+        <td style="color:var(--accent)">${proj || (i < 2 ? '—' : 0)}</td>
+      </tr>`;
+    }).join('');
+
+    document.getElementById('projecao-table-wrap').innerHTML = `
+      <table>
+        <thead><tr><th>Mês</th><th>Base (2 meses antes)</th><th>Reuniões da base</th><th>Projeção (20%)</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  },
+
+  /* ── MODAL ── */
+  abrirModal(titulo, corpo, botoes) {
+    document.getElementById('modal-title').innerHTML = titulo;
+    document.getElementById('modal-body').innerHTML  = corpo;
+    document.getElementById('modal-btns').innerHTML  = botoes.map((b,i) =>
+      `<button class="btn ${b.classe}" id="modal-btn-${i}">${b.label}</button>`
+    ).join('');
+    botoes.forEach((b,i) => document.getElementById(`modal-btn-${i}`).onclick = b.fn);
+    document.getElementById('modal-overlay').classList.add('open');
+  },
+
+  fecharModal() { document.getElementById('modal-overlay').classList.remove('open'); },
+
+  /* ── TOAST ── */
+  toast(msg, tipo = 'info') {
+    const c   = document.getElementById('toast-container');
+    const el  = document.createElement('div');
+    el.className = `toast ${tipo}`;
+    el.innerHTML = `<span>${{ success:'✅', error:'❌', info:'ℹ️' }[tipo] || ''}</span> ${msg}`;
+    c.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  },
+};
+
+/* ── START ── */
+Admin.init();
+</script>
+</body>
+</html>
