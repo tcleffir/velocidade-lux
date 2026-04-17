@@ -1223,6 +1223,7 @@ const RankingEngine = {
         fechamentos: 0,
         totalReceita: 0,
         ultimoFechamento: null,
+        participouFechamento: false,
       };
     });
 
@@ -1240,24 +1241,38 @@ const RankingEngine = {
         s.pontos += this.bonusReceita(e.valorGestao || 0);
         if (!s.ultimoFechamento || e.data > s.ultimoFechamento.data)
           s.ultimoFechamento = e;
+        // marca o EDN prospector como participante de fechamento
+        if (e.ednId && stats[e.ednId]) stats[e.ednId].participouFechamento = true;
+        s.participouFechamento = true;
       }
     });
 
     return Object.values(stats);
   },
 
-  /* Ranking de EDNs por reuniões realizadas */
+  /* Ranking de EDNs por reuniões realizadas
+     Desempate: participou de fechamento (fechou ou prospectou) > alfabético */
   rankingEDNs() {
     return this.calcularEstatisticas()
       .filter(s => s.vendedor.perfil === 'EDN' || s.vendedor.perfil === 'Ambos')
-      .sort((a, b) => b.reunioesRealizadas - a.reunioesRealizadas || b.pontos - a.pontos);
+      .sort((a, b) => {
+        if (b.reunioesRealizadas !== a.reunioesRealizadas) return b.reunioesRealizadas - a.reunioesRealizadas;
+        const af = a.participouFechamento ? 1 : 0, bf = b.participouFechamento ? 1 : 0;
+        if (bf !== af) return bf - af;
+        return (a.vendedor.nome + a.vendedor.sobrenome).localeCompare(b.vendedor.nome + b.vendedor.sobrenome);
+      });
   },
 
-  /* Ranking de Executivos por receita gerada */
+  /* Ranking de Executivos por receita gerada
+     Desempate: fechamentos > alfabético */
   rankingExecutivos() {
     return this.calcularEstatisticas()
       .filter(s => (s.vendedor.perfil === 'Executivo' || s.vendedor.perfil === 'Ambos') && !s.vendedor.ocultarTelao)
-      .sort((a, b) => b.totalReceita - a.totalReceita || b.fechamentos - a.fechamentos);
+      .sort((a, b) => {
+        if (b.totalReceita !== a.totalReceita) return b.totalReceita - a.totalReceita;
+        if (b.fechamentos !== a.fechamentos)   return b.fechamentos - a.fechamentos;
+        return (a.vendedor.nome + a.vendedor.sobrenome).localeCompare(b.vendedor.nome + b.vendedor.sobrenome);
+      });
   },
 
   /* Últimos N fechamentos do mês corrente */
@@ -1516,9 +1531,20 @@ const Renderers = {
       return;
     }
 
+    // Calcula posições reais com empates
+    const _posEDN = [];
+    ranking.slice(0, 7).forEach((s, i) => {
+      if (i === 0) { _posEDN.push(1); return; }
+      const prev = ranking[i-1];
+      const mesmoVal = s.reunioesRealizadas === prev.reunioesRealizadas;
+      const mesmoFech = s.participouFechamento === prev.participouFechamento;
+      _posEDN.push(mesmoVal && mesmoFech ? _posEDN[i-1] : i + 1);
+    });
+
     container.innerHTML = ranking.slice(0, 7).map((s, i) => {
-      const classe = i === 0 ? 'ouro' : i === 1 ? 'prata' : i === 2 ? 'bronze' : 'normal';
-      const medal  = i === 0 ? '🥇'   : i === 1 ? '🥈'   : i === 2 ? '🥉'    : null;
+      const pos    = _posEDN[i];
+      const classe = pos === 1 ? 'ouro' : pos === 2 ? 'prata' : pos === 3 ? 'bronze' : 'normal';
+      const medal  = pos === 1 ? '🥇'  : pos === 2 ? '🥈'   : pos === 3 ? '🥉'     : null;
       const pct    = maxVal > 0 ? Math.round((s.reunioesRealizadas / maxVal) * 100) : 0;
       const up     = mudancas[s.vendedor.id];
       const avatarHTML = s.vendedor.foto
@@ -1557,9 +1583,19 @@ const Renderers = {
       return;
     }
 
+    // Calcula posições reais com empates
+    const _posExec = [];
+    ranking.slice(0, 6).forEach((s, i) => {
+      if (i === 0) { _posExec.push(1); return; }
+      const prev = ranking[i-1];
+      const mesmo = s.totalReceita === prev.totalReceita && s.fechamentos === prev.fechamentos;
+      _posExec.push(mesmo ? _posExec[i-1] : i + 1);
+    });
+
     container.innerHTML = ranking.slice(0, 6).map((s, i) => {
-      const classe = i === 0 ? 'destaque-exec' : 'normal';
-      const medal  = i === 0 ? '🥇' : null;
+      const pos    = _posExec[i];
+      const classe = pos === 1 ? 'destaque-exec' : 'normal';
+      const medal  = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : null;
       const avatarHTML = s.vendedor.foto
         ? `<div class="avatar"><img src="${s.vendedor.foto}" alt=""></div>`
         : `<div class="avatar">${Utils.iniciais(s.vendedor.nome + ' ' + s.vendedor.sobrenome)}</div>`;
