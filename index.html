@@ -290,6 +290,26 @@
       text-align: right;
     }
 
+    /* Foguinho de assistências */
+    .assist-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      background: rgba(255,140,0,0.18);
+      border: 1px solid rgba(255,140,0,0.4);
+      border-radius: 10px;
+      padding: 1px 6px 1px 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #ffb347;
+      flex-shrink: 0;
+      margin-left: 5px;
+      vertical-align: middle;
+      line-height: 1.4;
+    }
+    .assist-badge .assist-icon { font-size: 12px; }
+    .assist-badge .assist-num  { color: #fff; }
+
     /* Indicador de ultrapassagem */
     .up-badge {
       font-size: 10px;
@@ -1542,6 +1562,13 @@ const Renderers = {
     const container = document.getElementById('ranking-edns');
     if (!container) return;
 
+    // Assistencias (prospecções que geraram fechamento) — atualizar aqui conforme o mês
+    const _ASSIST = {
+      'edn4': 2, // Jhonatas
+      'edn2': 1, // Caio
+      'edn3': 1, // Giovanna
+    };
+
     const maxVal = ranking.length ? ranking[0].reunioesRealizadas : 1;
 
     if (!ranking.length) {
@@ -1574,7 +1601,10 @@ const Renderers = {
           ${medal ? `<span class="medal-badge">${medal}</span>` : `<span class="pos-num">${i+1}</span>`}
           ${avatarHTML}
           <div class="pessoa-info">
-            <div class="pessoa-nome">${s.vendedor.nome} ${s.vendedor.sobrenome}</div>
+            <div class="pessoa-nome">
+              ${s.vendedor.nome} ${s.vendedor.sobrenome}
+              ${_ASSIST[s.vendedor.id] ? `<span class="assist-badge"><span class="assist-icon">🔥</span><span class="assist-num">${_ASSIST[s.vendedor.id]}</span></span>` : ''}
+            </div>
             <div class="pessoa-sub">${s.reunioesRealizadas} reuniões</div>
           </div>
           <div class="progress-wrap">
