@@ -1094,6 +1094,7 @@ const DataService = {
       { id:'_a4e', vendedorId:_fid('Jhonatas'), data:'2026-04-14', tipo:'reuniao_realizada' },
       { id:'_a4f', vendedorId:_fid('Jhonatas'), data:'2026-04-16', tipo:'reuniao_realizada' },
       { id:'_a4g', vendedorId:_fid('Jhonatas'), data:'2026-04-22', tipo:'reuniao_realizada' },
+      { id:'_a4h', vendedorId:_fid('Jhonatas'), data:'2026-04-24', tipo:'reuniao_realizada' },
       /* — Luana: 14 reunioes — */
       { id:'_a5a', vendedorId:_fid('Luana'), data:'2026-04-01', tipo:'reuniao_realizada' },
       { id:'_a5b', vendedorId:_fid('Luana'), data:'2026-04-03', tipo:'reuniao_realizada' },
@@ -1109,9 +1110,11 @@ const DataService = {
       { id:'_a5l', vendedorId:_fid('Luana'), data:'2026-04-22', tipo:'reuniao_realizada' },
       { id:'_a5m', vendedorId:_fid('Luana'), data:'2026-04-23', tipo:'reuniao_realizada' },
       { id:'_a5n', vendedorId:_fid('Luana'), data:'2026-04-24', tipo:'reuniao_realizada' },
+      { id:'_a5o', vendedorId:_fid('Luana'), data:'2026-04-25', tipo:'reuniao_realizada' },
       /* — Lorenzo: 2 reunioes — */
       { id:'_a6a', vendedorId:_fid('Lorenzo'), data:'2026-04-10', tipo:'reuniao_realizada' },
       { id:'_a6b', vendedorId:_fid('Lorenzo'), data:'2026-04-14', tipo:'reuniao_realizada' },
+      { id:'_a6c', vendedorId:_fid('Lorenzo'), data:'2026-04-24', tipo:'reuniao_realizada' },
       /* — Gabriel Veiga: 8 reunioes — */
       { id:'_a7a', vendedorId:_fid('Gabriel','Veiga'), data:'2026-04-02', tipo:'reuniao_realizada' },
       { id:'_a7b', vendedorId:_fid('Gabriel','Veiga'), data:'2026-04-05', tipo:'reuniao_realizada' },
@@ -1148,7 +1151,7 @@ const DataService = {
     this._cache.historico_2025.fechamentos = _H25_FECH;
 
     /* Histórico 2026: Jan-Mar são dados reais fixos; Abr em diante usa live */
-    const _H26_REUN = [21, 32, 36, 45,  0,  0,  0,  0,  0,  0,  0,  0];
+    const _H26_REUN = [21, 32, 36, 48,  0,  0,  0,  0,  0,  0,  0,  0];
     const _H26_FECH = [10,  0,  2,  5,  0,  0,  0,  0,  0,  0,  0,  0];
     _H26_REUN.forEach((v, i) => { if (v > 0) this._cache.historico_2026.reunioes[i]    = v; });
     _H26_FECH.forEach((v, i) => { if (v > 0) this._cache.historico_2026.fechamentos[i] = v; });
@@ -1866,7 +1869,7 @@ const DemoData = {
     }
 
     // 5. Reuniões e fechamentos reais 2026
-    const REUN_REAIS_2026 = [21, 32, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // Jan-Mar + Abr vazio (usa live) | Inclui Isabela
+    const REUN_REAIS_2026 = [21, 32, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // Jan-Mar + Abr usa live | Inclui Isabela
     const FECH_REAIS_2026 = [10, 0, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0];   // Jan:10, Fev:0, Mar:2, Abr:5 (inclui Fabio)
     const rawHist26 = localStorage.getItem('lux_historico_2026');
     const hist26    = rawHist26 ? JSON.parse(rawHist26) : { reunioes: Array(12).fill(0), fechamentos: Array(12).fill(0) };
@@ -1952,7 +1955,7 @@ const DemoData = {
       fechamentos: [ 4,  8,  2,  4,  8,  5,  5,  5,  7,  7,  3,  1], // dados reais (clientes únicos)
     };
     const historico2026 = {
-      reunioes:    [21, 32, 36, 45,  0,  0,  0,  0,  0,  0,  0,  0], // dados reais (inclui Isabela em Jan+Fev)
+      reunioes:    [21, 32, 36, 48,  0,  0,  0,  0,  0,  0,  0,  0], // dados reais (inclui Isabela em Jan+Fev)
       fechamentos: [10,  0,  2,  5,  0,  0,  0,  0,  0,  0,  0,  0], // Jan:10, Fev:0, Mar:2, Abr:5 (inclui Fabio)
     };
 
