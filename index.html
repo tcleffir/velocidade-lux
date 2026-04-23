@@ -978,9 +978,9 @@ const DataService = {
       localStorage.setItem('lux_destaques_anterior', JSON.stringify(this._cache.destaques_anterior));
     }
 
-    /* Migração 7: Abril 2026 = mínimo 4 fechamentos no gráfico (inclui Fábio) */
-    if ((this._cache.historico_2026.fechamentos[3] || 0) < 4) {
-      this._cache.historico_2026.fechamentos[3] = 4;
+    /* Migração 7: Abril 2026 = mínimo 6 fechamentos no gráfico (inclui Fábio) */
+    if ((this._cache.historico_2026.fechamentos[3] || 0) < 6) {
+      this._cache.historico_2026.fechamentos[3] = 6;
     }
 
     /* Migração 7b: Fábio sempre marcado como ocultarTelao */
@@ -1041,9 +1041,10 @@ const DataService = {
 
     /* Injeta apenas os eventos hardcoded que ainda não existem no cache.
        Eventos adicionados pelo Admin são preservados intactos. */
-    // Remove IDs antigos (a1-a17) para evitar dupla contagem com _evAbr
-    const _oldIds = new Set(['a1','a2','a3','a4','a5','a6','a7','a8','a9','a10','a11','a11b','a12','a13','a14','a15','a16','a17']);
-    this._cache.eventos = this._cache.eventos.filter(e => !_oldIds.has(e.id) && !String(e.id).startsWith('_a'));
+    // Remove TODOS os reuniao_realizada de abril 2026 para controle preciso dos numeros
+    this._cache.eventos = this._cache.eventos.filter(e =>
+      !(e.tipo === 'reuniao_realizada' && e.data && e.data.startsWith('2026-04-'))
+    );
     const _idsExistentes = new Set(this._cache.eventos.map(e => e.id));
 
     const _evAbr = [
@@ -1104,6 +1105,8 @@ const DataService = {
       { id:'_af1', vendedorId:_fid('Brunno'),            data:'2026-04-02', tipo:'fechamento', nomeCliente:'MAM Museu de Arte Moderna RJ', cidadeEstado:'Rio de Janeiro / RJ', numUnidades:1, valorGestao:3000, ednId:null },
       { id:'_af2', vendedorId:_fid('Brenda'),            data:'2026-04-14', tipo:'fechamento', nomeCliente:'MEC Plant',                    cidadeEstado:'',                    numUnidades:1, valorGestao:2500, ednId:null },
       { id:'_af3', vendedorId:_fid('Gabriel','Gracia'),  data:'2026-04-15', tipo:'fechamento', nomeCliente:'Maestro do Brasil',            cidadeEstado:'',                    numUnidades:2, valorGestao:2200, ednId:null },
+      { id:'_af4', vendedorId:_fid('Brenda'),            data:'2026-04-16', tipo:'fechamento', nomeCliente:'Cibra Minerios (Industria)',    cidadeEstado:'',                    numUnidades:1, valorGestao: 990, ednId:null },
+      { id:'_af5', vendedorId:_fid('Brenda'),            data:'2026-04-22', tipo:'fechamento', nomeCliente:'Corfio (Tradener)',             cidadeEstado:'',                    numUnidades:1, valorGestao: 990, ednId:null },
       { id:'_afF', vendedorId:_fid('Fábio'),             data:'2026-04-10', tipo:'fechamento', nomeCliente:'Boulevard Corporate Tower',     cidadeEstado:'Belo Horizonte / MG', numUnidades:1, valorGestao:3000, ednId:null },
     ].filter(e => e.vendedorId);
 
@@ -1113,9 +1116,9 @@ const DataService = {
     /* Migração 10b: Garante os 3 cards de fechamento exibidos no Q3 — cláusula pétrea.
        Para alterar os cards, atualize esta lista e faça deploy. */
     this._cache.ultimos_fechamentos = [
+      { cliente: 'Corfio (Tradener)',              executivo: 'Brenda Gino',       valor:  990, data: '22/04/2026' },
       { cliente: 'Cibra Minérios (Indústria)',    executivo: 'Brenda Gino',       valor:  990, data: '16/04/2026' },
       { cliente: 'Maestro do Brasil',             executivo: 'Gabriel Gracia',    valor: 2200, data: '15/04/2026' },
-      { cliente: 'MEC Plant',                     executivo: 'Brenda Gino',       valor: 2500, data: '14/04/2026' },
     ];
 
     /* Migração 12: Histórico 2025 e 2026 — CLÁUSULA PÉTREA
@@ -1127,7 +1130,7 @@ const DataService = {
 
     /* Histórico 2026: Jan-Mar são dados reais fixos; Abr em diante usa live */
     const _H26_REUN = [21, 32, 36, 45,  0,  0,  0,  0,  0,  0,  0,  0];
-    const _H26_FECH = [10,  0,  2,  4,  0,  0,  0,  0,  0,  0,  0,  0];
+    const _H26_FECH = [10,  0,  2,  6,  0,  0,  0,  0,  0,  0,  0,  0];
     _H26_REUN.forEach((v, i) => { if (v > 0) this._cache.historico_2026.reunioes[i]    = v; });
     _H26_FECH.forEach((v, i) => { if (v > 0) this._cache.historico_2026.fechamentos[i] = v; });
   },
@@ -1835,7 +1838,7 @@ const DemoData = {
 
     // 5. Reuniões e fechamentos reais 2026
     const REUN_REAIS_2026 = [21, 32, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // Jan-Mar + Abr vazio (usa live) | Inclui Isabela
-    const FECH_REAIS_2026 = [10, 0, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0];   // Jan:10, Fev:0, Mar:2, Abr:4
+    const FECH_REAIS_2026 = [10, 0, 2, 6, 0, 0, 0, 0, 0, 0, 0, 0];   // Jan:10, Fev:0, Mar:2, Abr:6 (inclui Fabio)
     const rawHist26 = localStorage.getItem('lux_historico_2026');
     const hist26    = rawHist26 ? JSON.parse(rawHist26) : { reunioes: Array(12).fill(0), fechamentos: Array(12).fill(0) };
     let changed26 = false;
@@ -1921,7 +1924,7 @@ const DemoData = {
     };
     const historico2026 = {
       reunioes:    [21, 32, 36, 45,  0,  0,  0,  0,  0,  0,  0,  0], // dados reais (inclui Isabela em Jan+Fev)
-      fechamentos: [10,  0,  2,  4,  0,  0,  0,  0,  0,  0,  0,  0], // Jan:10, Fev:0, Mar:2, Abr:4 (inclui Fábio)
+      fechamentos: [10,  0,  2,  6,  0,  0,  0,  0,  0,  0,  0,  0], // Jan:10, Fev:0, Mar:2, Abr:6 (inclui Fabio)
     };
 
     /* ---------- ÚLTIMOS FECHAMENTOS DO MÊS (abril 2026) ---------- */
