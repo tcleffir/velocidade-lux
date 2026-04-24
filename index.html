@@ -310,6 +310,21 @@
     .assist-badge .assist-icon { font-size: 12px; }
     .assist-badge .assist-num  { color: #fff; }
 
+    /* Foguete de acelerador de carreira */
+    .accel-badge {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(100,180,255,0.18);
+      border: 1px solid rgba(100,180,255,0.4);
+      border-radius: 10px;
+      padding: 1px 5px;
+      font-size: 12px;
+      flex-shrink: 0;
+      margin-left: 4px;
+      vertical-align: middle;
+      line-height: 1.4;
+    }
+
     /* Indicador de ultrapassagem */
     .up-badge {
       font-size: 10px;
@@ -1080,11 +1095,13 @@ const DataService = {
       { id:'_a1g', vendedorId:_fid('Bianca'), data:'2026-04-21', tipo:'reuniao_realizada' },
       { id:'_a1h', vendedorId:_fid('Bianca'), data:'2026-04-23', tipo:'reuniao_realizada' },
       { id:'_a1i', vendedorId:_fid('Bianca'), data:'2026-04-25', tipo:'reuniao_realizada' },
+      { id:'_a1j', vendedorId:_fid('Bianca'), data:'2026-04-28', tipo:'reuniao_realizada' },
       /* — Caio: 4 reunioes — */
       { id:'_a2a', vendedorId:_fid('Caio'), data:'2026-04-08', tipo:'reuniao_realizada' },
       { id:'_a2b', vendedorId:_fid('Caio'), data:'2026-04-15', tipo:'reuniao_realizada' },
       { id:'_a2c', vendedorId:_fid('Caio'), data:'2026-04-21', tipo:'reuniao_realizada' },
       { id:'_a2d', vendedorId:_fid('Caio'), data:'2026-04-22', tipo:'reuniao_realizada' },
+      { id:'_a2e', vendedorId:_fid('Caio'), data:'2026-04-28', tipo:'reuniao_realizada' },
       /* — Giovanna: 2 reunioes — */
       { id:'_a3a', vendedorId:_fid('Giovanna'), data:'2026-04-05', tipo:'reuniao_realizada' },
       { id:'_a3b', vendedorId:_fid('Giovanna'), data:'2026-04-13', tipo:'reuniao_realizada' },
@@ -1155,7 +1172,7 @@ const DataService = {
     this._cache.historico_2025.fechamentos = _H25_FECH;
 
     /* Histórico 2026: Jan-Mar são dados reais fixos; Abr em diante usa live */
-    const _H26_REUN = [21, 32, 36, 49,  0,  0,  0,  0,  0,  0,  0,  0];
+    const _H26_REUN = [21, 32, 36, 51,  0,  0,  0,  0,  0,  0,  0,  0];
     const _H26_FECH = [10,  0,  2,  7,  0,  0,  0,  0,  0,  0,  0,  0];
     _H26_REUN.forEach((v, i) => { if (v > 0) this._cache.historico_2026.reunioes[i]    = v; });
     _H26_FECH.forEach((v, i) => { if (v > 0) this._cache.historico_2026.fechamentos[i] = v; });
@@ -1569,36 +1586,52 @@ const Renderers = {
     const container = document.getElementById('ranking-edns');
     if (!container) return;
 
-    // Assistencias (prospecções que geraram fechamento) — atualizar aqui conforme o mês
+    // Assistencias: cada foguinho vale +2 reunioes NO RANKING APENAS (nao afeta grafico/meta/destaques)
     const _ASSIST = {
-      'edn4': 2, // Jhonatas
-      'edn2': 1, // Caio
-      'edn3': 1, // Giovanna
+      'edn4': 2, // Jhonatas: 2 foguinhos = +4 no ranking
+      'edn2': 1, // Caio:     1 foguinho  = +2 no ranking
+      'edn3': 1, // Giovanna: 1 foguinho  = +2 no ranking
     };
 
-    const maxVal = ranking.length ? ranking[0].reunioesRealizadas : 1;
+    // Acelerador de carreira — exibe foguete ao lado do nome
+    const _ACCEL = new Set(['edn4', 'exec3', 'edn1']); // Jhonatas, Luana, Bianca
 
-    if (!ranking.length) {
+    // Score de ranking = reunioes reais + bonus de foguinhos (2 por foguinho)
+    const score = s => s.reunioesRealizadas + (_ASSIST[s.vendedor.id] || 0) * 2;
+
+    // Re-ordena pelo score com bonus (desempate: participouFechamento > alfabetico)
+    const rankingOrdenado = [...ranking].sort((a, b) => {
+      if (score(b) !== score(a)) return score(b) - score(a);
+      const af = a.participouFechamento ? 1 : 0, bf = b.participouFechamento ? 1 : 0;
+      if (bf !== af) return bf - af;
+      return (a.vendedor.nome + a.vendedor.sobrenome).localeCompare(b.vendedor.nome + b.vendedor.sobrenome);
+    });
+
+    if (!rankingOrdenado.length) {
       container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div>Nenhum EDN cadastrado</div>';
       return;
     }
 
-    // Calcula posições reais com empates
+    const maxVal = score(rankingOrdenado[0]) || 1;
+
+    // Calcula posições reais com empates (baseado no score com bônus)
     const _posEDN = [];
-    ranking.slice(0, 7).forEach((s, i) => {
+    rankingOrdenado.slice(0, 7).forEach((s, i) => {
       if (i === 0) { _posEDN.push(1); return; }
-      const prev = ranking[i-1];
-      const mesmoVal = s.reunioesRealizadas === prev.reunioesRealizadas;
-      const mesmoFech = s.participouFechamento === prev.participouFechamento;
-      _posEDN.push(mesmoVal && mesmoFech ? _posEDN[i-1] : i + 1);
+      const prev = rankingOrdenado[i-1];
+      const mesmoScore = score(s) === score(prev);
+      const mesmoFech  = s.participouFechamento === prev.participouFechamento;
+      _posEDN.push(mesmoScore && mesmoFech ? _posEDN[i-1] : i + 1);
     });
 
-    container.innerHTML = ranking.slice(0, 7).map((s, i) => {
-      const pos    = _posEDN[i];
-      const classe = pos === 1 ? 'ouro' : pos === 2 ? 'prata' : pos === 3 ? 'bronze' : 'normal';
-      const medal  = pos === 1 ? '🥇'  : pos === 2 ? '🥈'   : pos === 3 ? '🥉'     : null;
-      const pct    = maxVal > 0 ? Math.round((s.reunioesRealizadas / maxVal) * 100) : 0;
-      const up     = mudancas[s.vendedor.id];
+    container.innerHTML = rankingOrdenado.slice(0, 7).map((s, i) => {
+      const pos       = _posEDN[i];
+      const classe    = pos === 1 ? 'ouro' : pos === 2 ? 'prata' : pos === 3 ? 'bronze' : 'normal';
+      const medal     = pos === 1 ? '🥇'  : pos === 2 ? '🥈'   : pos === 3 ? '🥉'     : null;
+      const scoreVal  = score(s);
+      const pct       = maxVal > 0 ? Math.round((scoreVal / maxVal) * 100) : 0;
+      const up        = mudancas[s.vendedor.id];
+      const assists   = _ASSIST[s.vendedor.id] || 0;
       const avatarHTML = s.vendedor.foto
         ? `<div class="avatar"><img src="${s.vendedor.foto}" alt=""></div>`
         : `<div class="avatar">${Utils.iniciais(s.vendedor.nome + ' ' + s.vendedor.sobrenome)}</div>`;
@@ -1610,14 +1643,15 @@ const Renderers = {
           <div class="pessoa-info">
             <div class="pessoa-nome">
               ${s.vendedor.nome} ${s.vendedor.sobrenome}
-              ${_ASSIST[s.vendedor.id] ? `<span class="assist-badge"><span class="assist-icon">🔥</span><span class="assist-num">${_ASSIST[s.vendedor.id]}</span></span>` : ''}
+              ${assists ? `<span class="assist-badge"><span class="assist-icon">🔥</span><span class="assist-num">${assists}</span></span>` : ''}
+              ${_ACCEL.has(s.vendedor.id) ? `<span class="accel-badge">🚀</span>` : ''}
             </div>
-            <div class="pessoa-sub">${s.reunioesRealizadas} reuniões</div>
+            <div class="pessoa-sub">${scoreVal} reuniões${assists ? ` <span style="opacity:.55;font-size:10px">(${s.reunioesRealizadas} reais)</span>` : ''}</div>
           </div>
           <div class="progress-wrap">
             <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
           </div>
-          <div class="pessoa-valor">${s.reunioesRealizadas}</div>
+          <div class="pessoa-valor">${scoreVal}</div>
           ${up ? `<div class="up-badge">↑${up}</div>` : ''}
         </div>
       `;
@@ -1959,7 +1993,7 @@ const DemoData = {
       fechamentos: [ 4,  8,  2,  4,  8,  5,  5,  5,  7,  7,  3,  1], // dados reais (clientes únicos)
     };
     const historico2026 = {
-      reunioes:    [21, 32, 36, 49,  0,  0,  0,  0,  0,  0,  0,  0], // dados reais (inclui Isabela em Jan+Fev)
+      reunioes:    [21, 32, 36, 51,  0,  0,  0,  0,  0,  0,  0,  0], // dados reais (inclui Isabela em Jan+Fev)
       fechamentos: [10,  0,  2,  7,  0,  0,  0,  0,  0,  0,  0,  0], // Jan:10, Fev:0, Mar:2, Abr:7 (inclui Fabio+Thiago)
     };
 
