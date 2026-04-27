@@ -1397,10 +1397,11 @@ const RankingEngine = {
     /* Projeção de fechamentos: 20% das reuniões realizadas 2 meses antes
        Ex.: projeção de Abril = 20% das reuniões de Fevereiro
        Para Jan/Fev 2026 usa o histórico de Nov/Dez 2025 como base. */
-    const projFech = Array(12).fill(0).map((_, m) => {
-      if (m < 2) return 0; // Janeiro e Fevereiro: sem projeção
-      const reun = reunioes2026[m - 2] || 0; // reuniões realizadas 2 meses antes (dentro de 2026)
-      return reun > 0 ? Math.round(reun * 0.20) : 0;
+    const projFech = Array(12).fill(null).map((_, m) => {
+      if (m < 2) return null; // Jan e Fev: sem projeção
+      const reun = reunioes2026[m - 2];   // reuniões realizadas 2 meses antes
+      if (reun == null || reun === 0) return null; // sem dado = linha some (nao zera)
+      return Math.round(reun * 0.20);
     });
 
     return {
@@ -1471,10 +1472,10 @@ const Charts = {
     const slice  = obj => ({ hist2025: obj.hist2025.slice(s,e), real2026: obj.real2026.slice(s,e), proj2026: obj.proj2026.slice(s,e) });
 
     this._renderGrafico('chart-reunioes',    meses6, slice(reunioes),    mesAtual, 'legenda-reunioes');
-    this._renderGrafico('chart-fechamentos', meses6, slice(fechamentos), mesAtual, 'legenda-fechamentos');
+    this._renderGrafico('chart-fechamentos', meses6, slice(fechamentos), mesAtual, 'legenda-fechamentos', 12);
   },
 
-  _renderGrafico(canvasId, meses, dados, mesAtual, legendaId) {
+  _renderGrafico(canvasId, meses, dados, mesAtual, legendaId, yMax) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
 
@@ -1512,15 +1513,19 @@ const Charts = {
       },
     ];
 
+    const opts = this.defaultOptions(mesAtual);
+    if (yMax != null) opts.scales.y.max = yMax;
+
     if (this.instancias[canvasId]) {
       const chart = this.instancias[canvasId];
       chart.data.datasets = datasets;
+      chart.options = opts;
       chart.update('none');
     } else {
       this.instancias[canvasId] = new Chart(canvas, {
         type: 'line',
         data: { labels: meses, datasets },
-        options: this.defaultOptions(mesAtual),
+        options: opts,
       });
     }
 
