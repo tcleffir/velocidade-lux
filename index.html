@@ -1103,6 +1103,7 @@ const DataService = {
       { id:'_a2d', vendedorId:_fid('Caio'), data:'2026-04-22', tipo:'reuniao_realizada' },
       { id:'_a2e', vendedorId:_fid('Caio'), data:'2026-04-28', tipo:'reuniao_realizada' },
       { id:'_a2f', vendedorId:_fid('Caio'), data:'2026-04-29', tipo:'reuniao_realizada' },
+      { id:'_a2g', vendedorId:_fid('Caio'), data:'2026-04-30', tipo:'reuniao_realizada' },
       /* — Giovanna: 2 reunioes — */
       { id:'_a3a', vendedorId:_fid('Giovanna'), data:'2026-04-05', tipo:'reuniao_realizada' },
       { id:'_a3b', vendedorId:_fid('Giovanna'), data:'2026-04-13', tipo:'reuniao_realizada' },
@@ -1180,7 +1181,7 @@ const DataService = {
     this._cache.historico_2025.fechamentos = _H25_FECH;
 
     /* Histórico 2026: Jan-Mar são dados reais fixos; Abr em diante usa live */
-    const _H26_REUN = [21, 32, 36, 57,  0,  0,  0,  0,  0,  0,  0,  0];
+    const _H26_REUN = [21, 32, 36, 58,  0,  0,  0,  0,  0,  0,  0,  0];
     const _H26_FECH = [10,  0,  2,  8,  0,  0,  0,  0,  0,  0,  0,  0];
     _H26_REUN.forEach((v, i) => { if (v > 0) this._cache.historico_2026.reunioes[i]    = v; });
     _H26_FECH.forEach((v, i) => { if (v > 0) this._cache.historico_2026.fechamentos[i] = v; });
@@ -2006,7 +2007,7 @@ const DemoData = {
       fechamentos: [ 4,  8,  2,  4,  8,  5,  5,  5,  7,  7,  3,  1], // dados reais (clientes únicos)
     };
     const historico2026 = {
-      reunioes:    [21, 32, 36, 57,  0,  0,  0,  0,  0,  0,  0,  0], // dados reais (inclui Isabela em Jan+Fev)
+      reunioes:    [21, 32, 36, 58,  0,  0,  0,  0,  0,  0,  0,  0], // dados reais (inclui Isabela em Jan+Fev)
       fechamentos: [10,  0,  2,  8,  0,  0,  0,  0,  0,  0,  0,  0], // Jan:10, Fev:0, Mar:2, Abr:8 (inclui Fabio+Thiago)
     };
 
