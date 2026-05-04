@@ -1175,8 +1175,9 @@ const DataService = {
 
     /* Eventos de Maio 2026 — ranking ao vivo de Maio */
     const _evMai = [
-      { id:'_mf1', vendedorId:_fid('Brenda'),           data:'2026-05-04', tipo:'fechamento', nomeCliente:'MIBA SP',              cidadeEstado:'', numUnidades: 1, valorGestao:1500, ednId:null },
-      { id:'_mf2', vendedorId:_fid('Gabriel','Gracia'), data:'2026-05-04', tipo:'fechamento', nomeCliente:'Grupo Tacla (Tradener)',cidadeEstado:'', numUnidades:12, valorGestao:6000, ednId:_fid('Luana') },
+      { id:'_mf1',  vendedorId:_fid('Brenda'),           data:'2026-05-04', tipo:'fechamento',        nomeCliente:'MIBA SP',              cidadeEstado:'', numUnidades: 1, valorGestao:1500, ednId:null },
+      { id:'_mf2',  vendedorId:_fid('Gabriel','Gracia'), data:'2026-05-04', tipo:'fechamento',        nomeCliente:'Grupo Tacla (Tradener)',cidadeEstado:'', numUnidades:12, valorGestao:6000, ednId:_fid('Luana') },
+      { id:'_mr3a', vendedorId:_fid('Giovanna'),         data:'2026-05-05', tipo:'reuniao_realizada' },
     ].filter(e => e.vendedorId);
 
     // Remove eventos de Maio antigos e re-injeta (determinístico)
