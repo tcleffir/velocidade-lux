@@ -1169,20 +1169,22 @@ const DataService = {
       { id:'_af7',  vendedorId:_fid('Brenda'),          data:'2026-04-30', tipo:'fechamento', nomeCliente:'Jauense',                          cidadeEstado:'',                    numUnidades:1, valorGestao:2000, ednId:null },
     ].filter(e => e.vendedorId);
 
-    const _evAbrNovos = _evAbr.filter(e => e.vendedorId && !_idsExistentes.has(e.id));
-    this._cache.eventos.push(..._evAbrNovos);
+    /* Abril agora é histórico — os dados ficam travados no hist26 (Migration 12).
+       NÃO re-injetamos _evAbr no cache de eventos para manter o ranking zerado em Maio. */
+    // NOTA: _evAbr foi preservado acima como referência; não é adicionado ao cache.
 
-    /* Eventos de Maio 2026 — mantidos FORA do cache de ranking (que apresenta Abril).
-       Aparecem apenas nos cards de ultimos_fechamentos.
-       Quando transicionarmos para Maio, mover para this._cache.eventos. */
-    // const _evMai = [ ... ];
+    /* Eventos de Maio 2026 — ranking ao vivo de Maio */
+    const _evMai = [
+      { id:'_mf1', vendedorId:_fid('Brenda'), data:'2026-05-04', tipo:'fechamento', nomeCliente:'MIBA SP', cidadeEstado:'', numUnidades:1, valorGestao:1500, ednId:null },
+    ].filter(e => e.vendedorId);
 
-    /* Migração 10b: Garante os 3 cards de fechamento exibidos — cláusula pétrea.
-       Para alterar os cards, atualize esta lista e faça deploy. */
+    // Remove eventos de Maio antigos e re-injeta (determinístico)
+    this._cache.eventos = this._cache.eventos.filter(e => !(e.data && e.data.startsWith('2026-05-')));
+    _evMai.forEach(e => this._cache.eventos.push(e));
+
+    /* Migração 10b: Cards de Últimos Fechamentos do Mês — Maio 2026 */
     this._cache.ultimos_fechamentos = [
-      { cliente: 'MIBA SP',                        executivo: 'Brenda Gino',       valor: 1500, data: '04/05/2026' },
-      { cliente: 'Jauense',                        executivo: 'Brenda Gino',       valor: 2000, data: '30/04/2026' },
-      { cliente: 'Nutriz (Tradener)',               executivo: 'Brenda Gino',       valor: 1980, data: '30/04/2026' },
+      { cliente: 'MIBA SP', executivo: 'Brenda Gino', valor: 1500, data: '04/05/2026' },
     ];
 
     /* Migração 12: Histórico 2025 e 2026 — CLÁUSULA PÉTREA
@@ -1373,9 +1375,9 @@ const RankingEngine = {
     const hist26  = DataService.getHistorico2026();
     const eventos = DataService.getEventos();
     const metas   = DataService.getMetas();
-    /* MES_DISPLAY: trava o gráfico em Abril (3) enquanto não há dados de Maio.
-       Para transicionar p/ Maio: mudar para Math.min(Utils.mesAtual(), 4)        */
-    const mesAtual = Math.min(Utils.mesAtual(), 3); // Abril = índice 3
+    /* MES_DISPLAY: mês de referência do gráfico (0=Jan … 4=Mai).
+       Para avançar para Junho: mudar para Math.min(Utils.mesAtual(), 5)          */
+    const mesAtual = Math.min(Utils.mesAtual(), 4); // Maio = índice 4
 
     /* Contagem ao vivo de 2026 a partir dos eventos */
     const reunioes2026_live    = Array(12).fill(0);
@@ -1394,7 +1396,7 @@ const RankingEngine = {
 
       if (m > mesAtual) return null;
       if (m < mesAtual) return (hist26.reunioes[m] > 0 ? hist26.reunioes[m] : live);
-      return live; // mês atual: sempre ao vivo
+      return live || null; // mês atual: ao vivo; null se ainda sem dados (linha some, não zera)
     });
 
     /* Fechamentos blended: meses passados usam override estático quando disponível;
@@ -1410,7 +1412,12 @@ const RankingEngine = {
     const countEdns = DataService.getVendedores().filter(v => v.perfil === 'EDN' || v.perfil === 'Ambos').length;
     const metaReunPorEdn = metas.reunioesPorEDN || 12;
     const projReunTotal = countEdns * metaReunPorEdn;
-    const projReun = Array(12).fill(0).map((_, i) => i <= mesAtual ? reunioes2026[i] : projReunTotal);
+    /* Projeção de reuniões: segue o real quando há dado; quando não há (mês atual
+       sem eventos ou meses futuros), projeta a meta flat (EDNs × 12).             */
+    const projReun = Array(12).fill(projReunTotal).map((_, i) => {
+      const r = reunioes2026[i];
+      return (r != null) ? r : projReunTotal;
+    });
 
     /* Projeção de fechamentos: 20% das reuniões realizadas 2 meses antes
        Ex.: projeção de Abril = 20% das reuniões de Fevereiro
@@ -1489,7 +1496,7 @@ const Charts = {
     const meses6 = Utils.MESES.slice(s, e);
     const slice  = obj => ({ hist2025: obj.hist2025.slice(s,e), real2026: obj.real2026.slice(s,e), proj2026: obj.proj2026.slice(s,e) });
 
-    this._renderGrafico('chart-reunioes',    meses6, slice(reunioes),    mesAtual, 'legenda-reunioes');
+    this._renderGrafico('chart-reunioes',    meses6, slice(reunioes),    mesAtual, 'legenda-reunioes',    80);
     this._renderGrafico('chart-fechamentos', meses6, slice(fechamentos), mesAtual, 'legenda-fechamentos', 12);
   },
 
@@ -1614,13 +1621,9 @@ const Renderers = {
     const container = document.getElementById('ranking-edns');
     if (!container) return;
 
-    // Assistencias: cada foguinho vale +2 reunioes NO RANKING APENAS (nao afeta grafico/meta/destaques)
-    const _ASSIST = {
-      'edn4':  2, // Jhonatas: 2 foguinhos = +4 no ranking
-      'edn2':  1, // Caio:     1 foguinho  = +2 no ranking
-      'edn3':  1, // Giovanna: 1 foguinho  = +2 no ranking
-      'exec3': 1, // Luana:    1 foguinho  = +2 no ranking (prospectou Nutriz)
-    };
+    // Assistencias Maio 2026: adicionar aqui à medida que ocorrerem
+    // Ex.: 'edn4': 1  →  Jhonatas ganhou 1 foguinho (+2 no ranking)
+    const _ASSIST = {}; // Maio: nenhuma assistência registrada ainda
 
     // Acelerador de carreira — exibe foguete ao lado do nome
     const _ACCEL = new Set(['edn4', 'exec3', 'edn1', 'edn2']); // Jhonatas, Luana, Bianca, Caio
