@@ -1175,7 +1175,8 @@ const DataService = {
 
     /* Eventos de Maio 2026 — ranking ao vivo de Maio */
     const _evMai = [
-      { id:'_mf1', vendedorId:_fid('Brenda'), data:'2026-05-04', tipo:'fechamento', nomeCliente:'MIBA SP', cidadeEstado:'', numUnidades:1, valorGestao:1500, ednId:null },
+      { id:'_mf1', vendedorId:_fid('Brenda'),           data:'2026-05-04', tipo:'fechamento', nomeCliente:'MIBA SP',              cidadeEstado:'', numUnidades: 1, valorGestao:1500, ednId:null },
+      { id:'_mf2', vendedorId:_fid('Gabriel','Gracia'), data:'2026-05-04', tipo:'fechamento', nomeCliente:'Grupo Tacla (Tradener)',cidadeEstado:'', numUnidades:12, valorGestao:6000, ednId:null },
     ].filter(e => e.vendedorId);
 
     // Remove eventos de Maio antigos e re-injeta (determinístico)
@@ -1184,7 +1185,8 @@ const DataService = {
 
     /* Migração 10b: Cards de Últimos Fechamentos do Mês — Maio 2026 */
     this._cache.ultimos_fechamentos = [
-      { cliente: 'MIBA SP', executivo: 'Brenda Gino', valor: 1500, data: '04/05/2026' },
+      { cliente: 'Grupo Tacla (Tradener)', executivo: 'Gabriel Gracia', valor: 6000, data: '04/05/2026' },
+      { cliente: 'MIBA SP',               executivo: 'Brenda Gino',    valor: 1500, data: '04/05/2026' },
     ];
 
     /* Migração 12: Histórico 2025 e 2026 — CLÁUSULA PÉTREA
