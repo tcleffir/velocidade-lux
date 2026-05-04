@@ -1176,7 +1176,7 @@ const DataService = {
     /* Eventos de Maio 2026 — ranking ao vivo de Maio */
     const _evMai = [
       { id:'_mf1', vendedorId:_fid('Brenda'),           data:'2026-05-04', tipo:'fechamento', nomeCliente:'MIBA SP',              cidadeEstado:'', numUnidades: 1, valorGestao:1500, ednId:null },
-      { id:'_mf2', vendedorId:_fid('Gabriel','Gracia'), data:'2026-05-04', tipo:'fechamento', nomeCliente:'Grupo Tacla (Tradener)',cidadeEstado:'', numUnidades:12, valorGestao:6000, ednId:null },
+      { id:'_mf2', vendedorId:_fid('Gabriel','Gracia'), data:'2026-05-04', tipo:'fechamento', nomeCliente:'Grupo Tacla (Tradener)',cidadeEstado:'', numUnidades:12, valorGestao:6000, ednId:_fid('Luana') },
     ].filter(e => e.vendedorId);
 
     // Remove eventos de Maio antigos e re-injeta (determinístico)
@@ -1623,9 +1623,10 @@ const Renderers = {
     const container = document.getElementById('ranking-edns');
     if (!container) return;
 
-    // Assistencias Maio 2026: adicionar aqui à medida que ocorrerem
-    // Ex.: 'edn4': 1  →  Jhonatas ganhou 1 foguinho (+2 no ranking)
-    const _ASSIST = {}; // Maio: nenhuma assistência registrada ainda
+    // Assistencias Maio 2026: cada foguinho vale +2 reunioes NO RANKING APENAS
+    const _ASSIST = {
+      'exec3': 1, // Luana: 1 foguinho = +2 no ranking (prospectou Grupo Tacla)
+    };
 
     // Acelerador de carreira — exibe foguete ao lado do nome
     const _ACCEL = new Set(['edn4', 'exec3', 'edn1', 'edn2']); // Jhonatas, Luana, Bianca, Caio
