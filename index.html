@@ -1183,6 +1183,8 @@ const DataService = {
       { id:'_mr3d', vendedorId:_fid('Gabriel','Veiga'),  data:'2026-05-05', tipo:'reuniao_realizada' },
       { id:'_mr3e', vendedorId:_fid('Gabriel','Veiga'),  data:'2026-05-06', tipo:'reuniao_realizada' },
       { id:'_mr3f', vendedorId:_fid('Gabriel','Veiga'),  data:'2026-05-07', tipo:'reuniao_realizada' },
+      { id:'_mr3g', vendedorId:_fid('Luana'),            data:'2026-05-07', tipo:'reuniao_realizada' },
+      { id:'_mr3h', vendedorId:_fid('Jhonatas'),         data:'2026-05-07', tipo:'reuniao_realizada' },
     ].filter(e => e.vendedorId);
 
     // Remove eventos de Maio antigos e re-injeta (determinístico)
@@ -1631,7 +1633,8 @@ const Renderers = {
 
     // Assistencias Maio 2026: cada foguinho vale +2 reunioes NO RANKING APENAS
     const _ASSIST = {
-      'exec3': 1, // Luana: 1 foguinho = +2 no ranking (prospectou Grupo Tacla)
+      'exec3': 1, // Luana:         1 foguinho = +2 (prospectou Grupo Tacla)
+      'edn5':  1, // Gabriel Veiga: 1 foguinho = +2
     };
 
     // Acelerador de carreira — exibe foguete ao lado do nome
