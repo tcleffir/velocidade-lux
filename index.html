@@ -1510,7 +1510,7 @@ const Charts = {
     const meses6 = Utils.MESES.slice(s, e);
     const slice  = obj => ({ hist2025: obj.hist2025.slice(s,e), real2026: obj.real2026.slice(s,e), proj2026: obj.proj2026.slice(s,e) });
 
-    this._renderGrafico('chart-reunioes',    meses6, slice(reunioes),    mesAtual, 'legenda-reunioes',    80, 15);
+    this._renderGrafico('chart-reunioes',    meses6, slice(reunioes),    mesAtual, 'legenda-reunioes',    75, 15);
     this._renderGrafico('chart-fechamentos', meses6, slice(fechamentos), mesAtual, 'legenda-fechamentos', 12);
   },
 
@@ -1553,8 +1553,11 @@ const Charts = {
     ];
 
     const opts = this.defaultOptions(mesAtual);
-    if (yMax      != null) opts.scales.y.max                    = yMax;
-    if (stepSize  != null) opts.scales.y.ticks.stepSize         = stepSize;
+    if (yMax     != null) opts.scales.y.max              = yMax;
+    if (stepSize != null) {
+      opts.scales.y.ticks.stepSize     = stepSize;
+      opts.scales.y.ticks.maxTicksLimit = 20; // deixa o stepSize mandar
+    }
 
     if (this.instancias[canvasId]) {
       const chart = this.instancias[canvasId];
