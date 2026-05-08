@@ -1426,11 +1426,15 @@ const RankingEngine = {
     const countEdns = DataService.getVendedores().filter(v => v.perfil === 'EDN' || v.perfil === 'Ambos').length;
     const metaReunPorEdn = metas.reunioesPorEDN || 12;
     const projReunTotal = countEdns * metaReunPorEdn;
-    /* Projeção de reuniões: segue o real quando há dado; quando não há (mês atual
-       sem eventos ou meses futuros), projeta a meta flat (EDNs × 12).             */
+    /* Projeção de reuniões:
+       - Meses passados (< mesAtual): segue o real realizado
+       - Mês atual e futuros: mostra sempre a meta flat (EDNs × 12)
+       Isso garante que a linha tracejada fique em 84 em Maio,
+       independente do progresso real parcial do mês.               */
     const projReun = Array(12).fill(projReunTotal).map((_, i) => {
+      if (i >= mesAtual) return projReunTotal; // atual/futuro: sempre a meta
       const r = reunioes2026[i];
-      return (r != null) ? r : projReunTotal;
+      return (r != null) ? r : projReunTotal;  // passado: segue o real
     });
 
     /* Projeção de fechamentos: 20% das reuniões realizadas 2 meses antes
