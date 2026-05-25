@@ -1045,7 +1045,6 @@ const DataService = {
     /* Migração 11: Garante equipe completa — cláusula pétrea
        Se o Gist tiver equipe incompleta, injeta os membros faltantes pelo nome. */
     const _EQUIPE_CORRETA = [
-      { nome: 'Bianca',   sobrenome: 'Oliveira',   perfil: 'EDN',       id: 'edn1'  },
       { nome: 'Caio',     sobrenome: 'Dorneles',   perfil: 'EDN',       id: 'edn2'  },
       { nome: 'Giovanna', sobrenome: 'Bispo',      perfil: 'EDN',       id: 'edn3'  },
       { nome: 'Jhonatas', sobrenome: 'Baldez',     perfil: 'EDN',       id: 'edn4'  },
@@ -1071,6 +1070,9 @@ const DataService = {
         if (esp.sobrenome && !existe.sobrenome) existe.sobrenome = esp.sobrenome;
       }
     });
+
+    /* Migração 13: Remove Bianca Oliveira (edn1) — desligada */
+    this._cache.equipe = this._cache.equipe.filter(m => m.id !== 'edn1');
 
     /* Migração 10: Substitui eventos de Abril 2026 com dados reais corretos
        O Gist pode ter dados incompletos — esta migração garante os valores certos. */
@@ -1207,6 +1209,13 @@ const DataService = {
       { id:'_mr5b', vendedorId:_fid('Giovanna'), data:'2026-05-19', tipo:'reuniao_realizada' },
       { id:'_mr5c', vendedorId:_fid('Caio'),     data:'2026-05-19', tipo:'reuniao_realizada' },
       { id:'_mr5d', vendedorId:_fid('Caio'),     data:'2026-05-19', tipo:'reuniao_realizada' },
+      { id:'_mr5e', vendedorId:_fid('Caio'),     data:'2026-05-20', tipo:'reuniao_realizada' },
+      { id:'_mr5f', vendedorId:_fid('Caio'),     data:'2026-05-20', tipo:'reuniao_realizada' },
+      { id:'_mr5g', vendedorId:_fid('Caio'),     data:'2026-05-20', tipo:'reuniao_realizada' },
+      { id:'_mr5h', vendedorId:_fid('Jhonatas'), data:'2026-05-19', tipo:'reuniao_realizada' },
+      { id:'_mr5i', vendedorId:_fid('Jhonatas'), data:'2026-05-20', tipo:'reuniao_realizada' },
+      { id:'_mr5j', vendedorId:_fid('Lorenzo'),  data:'2026-05-20', tipo:'reuniao_realizada' },
+      { id:'_mr5k', vendedorId:_fid('Luana'),    data:'2026-05-20', tipo:'reuniao_realizada' },
     ].filter(e => e.vendedorId);
 
     // Remove eventos de Maio antigos e re-injeta (determinístico)
@@ -1670,7 +1679,7 @@ const Renderers = {
     };
 
     // Acelerador de carreira — exibe foguete ao lado do nome
-    const _ACCEL = new Set(['edn4', 'exec3', 'edn1', 'edn2']); // Jhonatas, Luana, Bianca, Caio
+    const _ACCEL = new Set(['edn4', 'exec3', 'edn2']); // Jhonatas, Luana, Caio
 
     // Score de ranking = reunioes reais + bonus de foguinhos (2 por foguinho)
     const score = s => s.reunioesRealizadas + (_ASSIST[s.vendedor.id] || 0) * 2;
