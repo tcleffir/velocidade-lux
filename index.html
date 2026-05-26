@@ -1182,7 +1182,8 @@ const DataService = {
       { id:'_mf3',  vendedorId:_fid('Gabriel','Gracia'), data:'2026-05-08', tipo:'fechamento', nomeCliente:'PRECICAST (Tradener)',           cidadeEstado:'', numUnidades: 1, valorGestao: 990, ednId:_fid('Jhonatas') },
       { id:'_mf6',  vendedorId:_fid('Gabriel','Gracia'), data:'2026-05-19', tipo:'fechamento', nomeCliente:'Centro Administrativo Rio Negro', cidadeEstado:'', numUnidades: 1, valorGestao:1200, ednId:_fid('Luana') },
       { id:'_mf4',  vendedorId:_fid('Gabriel','Veiga'), data:'2026-05-08', tipo:'fechamento', nomeCliente:'Bioxxi',             cidadeEstado:'', numUnidades: 1, valorGestao:4000, ednId:null },
-      { id:'_mf5',  vendedorId:_fid('Fábio'),           data:'2026-05-09', tipo:'fechamento', nomeCliente:'Viva! Campo Belo',   cidadeEstado:'', numUnidades: 1, valorGestao:1000, ednId:null },
+      { id:'_mf5',  vendedorId:_fid('Fábio'), data:'2026-05-09', tipo:'fechamento', nomeCliente:'Viva! Campo Belo',          cidadeEstado:'', numUnidades:1, valorGestao:1000, ednId:null },
+      { id:'_mf7',  vendedorId:_fid('Fábio'), data:'2026-05-20', tipo:'fechamento', nomeCliente:'Subcondominio Lake Victoria', cidadeEstado:'', numUnidades:1, valorGestao:2000, ednId:null },
       /* — Reuniões Maio — */
       { id:'_mr3a', vendedorId:_fid('Giovanna'),         data:'2026-05-05', tipo:'reuniao_realizada' },
       { id:'_mr3b', vendedorId:_fid('Bianca'),           data:'2026-05-05', tipo:'reuniao_realizada' },
@@ -1224,9 +1225,9 @@ const DataService = {
 
     /* Migração 10b: Cards de Últimos Fechamentos do Mês — Maio 2026 */
     this._cache.ultimos_fechamentos = [
-      { cliente: 'Centro Adm. Rio Negro',  executivo: 'Gabriel Gracia', valor: 1200, data: '19/05/2026' },
-      { cliente: 'Viva! Campo Belo',       executivo: 'Fábio Nunes',    valor: 1000, data: '09/05/2026' },
-      { cliente: 'Bioxxi',                 executivo: 'Gabriel Veiga',  valor: 4000, data: '08/05/2026' },
+      { cliente: 'Subcondominio Lake Victoria', executivo: 'Fábio Nunes',    valor: 2000, data: '20/05/2026' },
+      { cliente: 'Centro Adm. Rio Negro',       executivo: 'Gabriel Gracia', valor: 1200, data: '19/05/2026' },
+      { cliente: 'Viva! Campo Belo',            executivo: 'Fábio Nunes',    valor: 1000, data: '09/05/2026' },
     ];
 
     /* Migração 12: Histórico 2025 e 2026 — CLÁUSULA PÉTREA
