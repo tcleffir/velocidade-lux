@@ -325,6 +325,26 @@
       line-height: 1.4;
     }
 
+    /* Badge de Geração Distribuída (plaquinha solar) */
+    .gd-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      background: rgba(255, 214, 0, 0.18);
+      border: 1px solid rgba(255, 214, 0, 0.45);
+      border-radius: 10px;
+      padding: 1px 6px 1px 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #ffd600;
+      flex-shrink: 0;
+      margin-left: 5px;
+      vertical-align: middle;
+      line-height: 1.4;
+    }
+    .gd-badge .gd-icon { font-size: 12px; }
+    .gd-badge .gd-num  { color: #fff; }
+
     /* Indicador de ultrapassagem */
     .up-badge {
       font-size: 10px;
@@ -1220,6 +1240,11 @@ const DataService = {
       { id:'_mr6c', vendedorId:_fid('Jhonatas'), data:'2026-05-20', tipo:'reuniao_realizada' },
       { id:'_mr6d', vendedorId:_fid('Jhonatas'), data:'2026-05-20', tipo:'reuniao_realizada' },
       { id:'_mr6e', vendedorId:_fid('Giovanna'), data:'2026-05-20', tipo:'reuniao_realizada' },
+      { id:'_mr6f', vendedorId:_fid('Giovanna'), data:'2026-05-22', tipo:'reuniao_realizada' },
+      { id:'_mr6g', vendedorId:_fid('Jhonatas'), data:'2026-05-22', tipo:'reuniao_realizada' },
+      { id:'_mr6h', vendedorId:_fid('Lorenzo'),  data:'2026-05-22', tipo:'reuniao_realizada' },
+      { id:'_mr6i', vendedorId:_fid('Luana'),    data:'2026-05-22', tipo:'reuniao_realizada' },
+      { id:'_mr6j', vendedorId:_fid('Gabriel','Veiga'), data:'2026-05-22', tipo:'reuniao_realizada' },
       { id:'_mr5j', vendedorId:_fid('Lorenzo'),  data:'2026-05-20', tipo:'reuniao_realizada' },
       { id:'_mr5k', vendedorId:_fid('Luana'),    data:'2026-05-20', tipo:'reuniao_realizada' },
     ].filter(e => e.vendedorId);
@@ -1684,11 +1709,16 @@ const Renderers = {
       'edn4':  1, // Jhonatas:      1 foguinho = +2 (prospectou PRECICAST)
     };
 
+    // Geração Distribuída: cada fechamento GD vale +1 no ranking (sem valor financeiro)
+    const _GD = {
+      'edn5': 3, // Gabriel Veiga: 3 fechamentos GD = +3 no ranking
+    };
+
     // Acelerador de carreira — exibe foguete ao lado do nome
     const _ACCEL = new Set(['edn4', 'exec3', 'edn2']); // Jhonatas, Luana, Caio
 
-    // Score de ranking = reunioes reais + bonus de foguinhos (2 por foguinho)
-    const score = s => s.reunioesRealizadas + (_ASSIST[s.vendedor.id] || 0) * 2;
+    // Score de ranking = reais + foguinhos×2 + GD×1
+    const score = s => s.reunioesRealizadas + (_ASSIST[s.vendedor.id] || 0) * 2 + (_GD[s.vendedor.id] || 0);
 
     // Re-ordena pelo score com bonus (desempate: participouFechamento > alfabetico)
     const rankingOrdenado = [...ranking].sort((a, b) => {
@@ -1723,6 +1753,7 @@ const Renderers = {
       const pct       = maxVal > 0 ? Math.round((scoreVal / maxVal) * 100) : 0;
       const up        = mudancas[s.vendedor.id];
       const assists   = _ASSIST[s.vendedor.id] || 0;
+      const gds       = _GD[s.vendedor.id] || 0;
       const avatarHTML = s.vendedor.foto
         ? `<div class="avatar"><img src="${s.vendedor.foto}" alt=""></div>`
         : `<div class="avatar">${Utils.iniciais(s.vendedor.nome + ' ' + s.vendedor.sobrenome)}</div>`;
@@ -1735,9 +1766,10 @@ const Renderers = {
             <div class="pessoa-nome">
               ${s.vendedor.nome} ${s.vendedor.sobrenome}
               ${assists ? `<span class="assist-badge"><span class="assist-icon">🔥</span><span class="assist-num">${assists}</span></span>` : ''}
+              ${gds ? `<span class="gd-badge"><span class="gd-icon">☀️</span><span class="gd-num">${gds}</span></span>` : ''}
               ${_ACCEL.has(s.vendedor.id) ? `<span class="accel-badge">🚀</span>` : ''}
             </div>
-            <div class="pessoa-sub">${scoreVal} reuniões${assists ? ` <span style="opacity:.55;font-size:10px">(${s.reunioesRealizadas} reais)</span>` : ''}</div>
+            <div class="pessoa-sub">${scoreVal} reuniões${(assists || gds) ? ` <span style="opacity:.55;font-size:10px">(${s.reunioesRealizadas} reais)</span>` : ''}</div>
           </div>
           <div class="progress-wrap">
             <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
