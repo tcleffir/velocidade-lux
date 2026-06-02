@@ -219,10 +219,15 @@
     .pessoa-row.bronze { background: rgba(205,127,50,0.08); border: 1px solid rgba(205,127,50,0.18); }
     .pessoa-row.normal { background: var(--glass-bg); border: 1px solid var(--glass-border); }
 
-    /* Destaque de senioridade — on fire 🔥 */
+    /* Destaque de senioridade — gold premium ✨ */
     .pessoa-row.senior {
-      border-left: 3px solid rgba(255, 80, 30, 0.85);
-      background-image: linear-gradient(90deg, rgba(255, 80, 30, 0.10) 0%, transparent 60%);
+      border: 1px solid rgba(255, 195, 40, 0.45) !important;
+      background: linear-gradient(105deg,
+        rgba(255, 195, 40, 0.18) 0%,
+        rgba(255, 220, 100, 0.10) 35%,
+        rgba(255, 195, 40, 0.04) 70%,
+        transparent 100%) !important;
+      box-shadow: 0 0 18px rgba(255, 195, 40, 0.12), inset 0 1px 0 rgba(255, 220, 120, 0.18);
     }
     .pessoa-row.destaque-exec { background: var(--glass-gold); border: 1px solid var(--glass-gold-border); }
 
