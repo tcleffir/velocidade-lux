@@ -218,6 +218,12 @@
     .pessoa-row.prata  { background: rgba(192,192,192,0.08); border: 1px solid rgba(192,192,192,0.18); }
     .pessoa-row.bronze { background: rgba(205,127,50,0.08); border: 1px solid rgba(205,127,50,0.18); }
     .pessoa-row.normal { background: var(--glass-bg); border: 1px solid var(--glass-border); }
+
+    /* Destaque de senioridade — nível acima dos demais */
+    .pessoa-row.senior {
+      border-left: 3px solid rgba(0, 210, 190, 0.75);
+      background-image: linear-gradient(90deg, rgba(0, 210, 190, 0.08) 0%, transparent 60%);
+    }
     .pessoa-row.destaque-exec { background: var(--glass-gold); border: 1px solid var(--glass-gold-border); }
 
     .medal-badge { font-size: 18px; flex-shrink: 0; width: 20px; text-align: center; }
@@ -1660,6 +1666,9 @@ const Renderers = {
     // Geração Distribuída Junho 2026: cada GD vale +1 no ranking
     const _GD = {}; // Adicionar conforme fechamentos GD ocorrerem
 
+    // Senioridade elevada — destaque visual no card
+    const _SENIOR = new Set(['exec3', 'edn4']); // Luana, Jhonatas
+
     // Acelerador de carreira: mapa com quantidade de foguetes por vendedor
     const _ACCEL = {
       'exec3': 2, // Luana:         🚀🚀
@@ -1697,7 +1706,8 @@ const Renderers = {
 
     container.innerHTML = rankingOrdenado.slice(0, 7).map((s, i) => {
       const pos       = _posEDN[i];
-      const classe    = pos === 1 ? 'ouro' : pos === 2 ? 'prata' : pos === 3 ? 'bronze' : 'normal';
+      const classePos = pos === 1 ? 'ouro' : pos === 2 ? 'prata' : pos === 3 ? 'bronze' : 'normal';
+      const classe    = _SENIOR.has(s.vendedor.id) ? `${classePos} senior` : classePos;
       const medal     = pos === 1 ? '🥇'  : pos === 2 ? '🥈'   : pos === 3 ? '🥉'     : null;
       const scoreVal  = score(s);
       const pct       = maxVal > 0 ? Math.round((scoreVal / maxVal) * 100) : 0;
