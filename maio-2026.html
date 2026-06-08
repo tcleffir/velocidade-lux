@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velocidade da Lux — Fechamento Maio 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0d1117;
+    --card:      rgba(255,255,255,0.07);
+    --border:    rgba(255,255,255,0.12);
+    --green:     #8bc34a;
+    --gold:      #ffc107;
+    --gold-dim:  rgba(255,193,7,0.18);
+    --gold-brd:  rgba(255,193,7,0.40);
+    --text:      rgba(255,255,255,0.90);
+    --sub:       rgba(255,255,255,0.45);
+  }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 32px 24px 48px;
+  }
+
+  /* ── HEADER ─────────────────────────────── */
+  .header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .header .logo { font-size: 11px; letter-spacing: 3px; color: var(--sub); text-transform: uppercase; }
+  .header h1   { font-size: 28px; font-weight: 800; color: #fff; margin: 6px 0 4px; }
+  .header .sub { font-size: 13px; color: var(--sub); }
+  .tag {
+    display: inline-block; margin-top: 10px;
+    background: rgba(139,195,74,0.15); border: 1px solid rgba(139,195,74,0.35);
+    color: var(--green); font-size: 11px; font-weight: 700;
+    padding: 3px 12px; border-radius: 20px; letter-spacing: 1px;
+  }
+
+  /* ── GRID ───────────────────────────────── */
+  .grid { display: grid; gap: 20px; max-width: 980px; margin: 0 auto; }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+  @media (max-width: 680px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  /* ── CARD ───────────────────────────────── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+  .card-title {
+    font-size: 9px; font-weight: 700; letter-spacing: 2px;
+    color: var(--sub); text-transform: uppercase; margin-bottom: 14px;
+  }
+
+  /* ── DESTAQUES ──────────────────────────── */
+  .destaque-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .destaque-row:last-child { border-bottom: none; }
+  .destaque-label { font-size: 9px; color: var(--sub); letter-spacing: 1px; text-transform: uppercase; min-width: 90px; }
+  .destaque-nome  { font-size: 13px; font-weight: 700; flex: 1; }
+  .destaque-val   { font-size: 16px; font-weight: 800; color: var(--green); }
+  .destaque-icon  { font-size: 20px; }
+
+  /* ── RANKING EDN ────────────────────────── */
+  .rank-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 10px; margin-bottom: 6px;
+    background: var(--card); border: 1px solid var(--border);
+  }
+  .rank-row.gold-card {
+    background: linear-gradient(105deg, rgba(255,190,20,0.38) 0%, rgba(255,215,80,0.22) 45%, rgba(255,190,20,0.10) 100%);
+    border: 1px solid rgba(255,200,40,0.70);
+    box-shadow: 0 0 20px rgba(255,195,40,0.25), inset 0 1px 0 rgba(255,235,140,0.30);
+  }
+  .rank-pos  { font-size: 16px; min-width: 28px; text-align: center; }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(139,195,74,0.2); border: 1px solid rgba(139,195,74,0.35);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--green); flex-shrink: 0;
+  }
+  .rank-info { flex: 1; }
+  .rank-nome { font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+  .rank-nome.gold-text { color: #ffe066; text-shadow: 0 0 8px rgba(255,210,50,0.5); }
+  .rank-sub  { font-size: 10px; color: var(--sub); margin-top: 1px; }
+  .rank-val  { font-size: 18px; font-weight: 800; min-width: 28px; text-align: right; }
+  .rank-val.gold-text { color: #ffe066; text-shadow: 0 0 8px rgba(255,210,50,0.5); }
+
+  /* progress */
+  .prog-wrap { width: 70px; }
+  .prog-track { height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+  .prog-fill  { height: 100%; background: var(--green); border-radius: 2px; }
+
+  /* badges */
+  .badge-fire {
+    display: inline-flex; align-items: center; gap: 2px;
+    background: rgba(255,140,0,0.18); border: 1px solid rgba(255,140,0,0.40);
+    border-radius: 10px; padding: 1px 5px 1px 3px;
+    font-size: 10px; font-weight: 700; color: #ffb347;
+  }
+  .badge-rocket {
+    display: inline-flex; align-items: center;
+    background: rgba(100,180,255,0.18); border: 1px solid rgba(100,180,255,0.40);
+    border-radius: 10px; padding: 1px 5px;
+    font-size: 11px;
+  }
+  .badge-gd {
+    display: inline-flex; align-items: center; gap: 2px;
+    background: rgba(255,214,0,0.18); border: 1px solid rgba(255,214,0,0.45);
+    border-radius: 10px; padding: 1px 5px 1px 3px;
+    font-size: 10px; font-weight: 700; color: #ffd600;
+  }
+
+  /* ── EXECUTIVOS ─────────────────────────── */
+  .exec-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px; border-radius: 10px; margin-bottom: 6px;
+    background: var(--card); border: 1px solid var(--border);
+  }
+  .exec-row:first-child { background: var(--gold-dim); border-color: var(--gold-brd); }
+  .exec-nome  { flex: 1; font-size: 13px; font-weight: 700; }
+  .exec-meta  { font-size: 11px; color: var(--sub); }
+  .exec-val   { font-size: 15px; font-weight: 800; color: var(--green); }
+
+  /* ── FECHAMENTOS ────────────────────────── */
+  .fech-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .fech-row:last-child { border-bottom: none; }
+  .fech-dot  { width: 8px; height: 8px; border-radius: 50%; background: var(--green); margin-top: 5px; flex-shrink: 0; }
+  .fech-info { flex: 1; }
+  .fech-nome { font-size: 13px; font-weight: 700; }
+  .fech-exec { font-size: 11px; color: var(--sub); margin-top: 2px; }
+  .fech-val  { font-size: 14px; font-weight: 800; color: var(--green); white-space: nowrap; }
+  .fech-data { font-size: 10px; color: var(--sub); white-space: nowrap; }
+
+  /* ── TOTAIS ─────────────────────────────── */
+  .stat-box {
+    text-align: center; padding: 16px 10px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  }
+  .stat-val   { font-size: 32px; font-weight: 800; color: var(--green); }
+  .stat-label { font-size: 10px; color: var(--sub); letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+
+  /* ── FOOTER ─────────────────────────────── */
+  .footer { text-align: center; margin-top: 40px; font-size: 11px; color: rgba(255,255,255,0.2); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">Velocidade da Lux</div>
+  <h1>Fechamento — Maio 2026</h1>
+  <div class="sub">Snapshot final do mês</div>
+  <div class="tag">✓ MÊS ENCERRADO</div>
+</div>
+
+<div class="grid" style="max-width:980px;margin:0 auto;">
+
+  <!-- TOTAIS -->
+  <div class="grid-3">
+    <div class="stat-box">
+      <div class="stat-val">46</div>
+      <div class="stat-label">Reuniões Realizadas</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val">7</div>
+      <div class="stat-label">Fechamentos</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" style="font-size:22px">R$ 14.990</div>
+      <div class="stat-label">Receita Total</div>
+    </div>
+  </div>
+
+  <!-- DESTAQUES -->
+  <div class="card">
+    <div class="card-title">⭐ Destaques — Maio 2026</div>
+    <div class="destaque-row">
+      <div class="destaque-icon">🏆</div>
+      <div class="destaque-label">Mais Reuniões</div>
+      <div class="destaque-nome">Luana Furtado</div>
+      <div class="destaque-val">15</div>
+    </div>
+    <div class="destaque-row">
+      <div class="destaque-icon">🏆</div>
+      <div class="destaque-label">Mais Fechamentos</div>
+      <div class="destaque-nome">Gabriel Gracia</div>
+      <div class="destaque-val">3</div>
+    </div>
+    <div class="destaque-row">
+      <div class="destaque-icon">🏆</div>
+      <div class="destaque-label">Maior Receita</div>
+      <div class="destaque-nome">Gabriel Gracia</div>
+      <div class="destaque-val">R$ 8.190</div>
+    </div>
+  </div>
+
+  <!-- RANKING EDN + EXECUTIVOS -->
+  <div class="grid-2">
+
+    <!-- EDN -->
+    <div class="card">
+      <div class="card-title">EDNs — Reuniões Realizadas (Score Final)</div>
+
+      <!-- Luana -->
+      <div class="rank-row gold-card">
+        <div class="rank-pos">🥇</div>
+        <div class="avatar">LF</div>
+        <div class="rank-info">
+          <div class="rank-nome gold-text">
+            Luana Furtado
+            <span class="badge-fire">🔥<span>2</span></span>
+            <span class="badge-rocket">🚀</span>
+          </div>
+          <div class="rank-sub">15 pts &nbsp;<span style="opacity:.55;font-size:9px">(11 reais)</span></div>
+        </div>
+        <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" style="width:100%"></div></div></div>
+        <div class="rank-val gold-text">15</div>
+      </div>
+
+      <!-- Gabriel Veiga -->
+      <div class="rank-row">
+        <div class="rank-pos">🥈</div>
+        <div class="avatar">GV</div>
+        <div class="rank-info">
+          <div class="rank-nome">
+            Gabriel Veiga
+            <span class="badge-fire">🔥<span>1</span></span>
+            <span class="badge-gd">☀️<span>4</span></span>
+          </div>
+          <div class="rank-sub">14 pts &nbsp;<span style="opacity:.55;font-size:9px">(8 reais)</span></div>
+        </div>
+        <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" style="width:93%"></div></div></div>
+        <div class="rank-val">14</div>
+      </div>
+
+      <!-- Jhonatas -->
+      <div class="rank-row gold-card">
+        <div class="rank-pos">🥉</div>
+        <div class="avatar">JB</div>
+        <div class="rank-info">
+          <div class="rank-nome gold-text">
+            Jhonatas Baldez
+            <span class="badge-fire">🔥<span>1</span></span>
+            <span class="badge-rocket">🚀</span>
+          </div>
+          <div class="rank-sub">10 pts &nbsp;<span style="opacity:.55;font-size:9px">(8 reais)</span></div>
+        </div>
+        <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" style="width:67%"></div></div></div>
+        <div class="rank-val gold-text">10</div>
+      </div>
+
+      <!-- Caio -->
+      <div class="rank-row">
+        <div class="rank-pos" style="font-size:12px;color:var(--sub)">4</div>
+        <div class="avatar">CD</div>
+        <div class="rank-info">
+          <div class="rank-nome">Caio Dorneles <span class="badge-rocket">🚀</span></div>
+          <div class="rank-sub">9 reuniões</div>
+        </div>
+        <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" style="width:60%"></div></div></div>
+        <div class="rank-val">9</div>
+      </div>
+
+      <!-- Giovanna -->
+      <div class="rank-row">
+        <div class="rank-pos" style="font-size:12px;color:var(--sub)">5</div>
+        <div class="avatar">GB</div>
+        <div class="rank-info">
+          <div class="rank-nome">Giovanna Bispo</div>
+          <div class="rank-sub">7 reuniões</div>
+        </div>
+        <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" style="width:47%"></div></div></div>
+        <div class="rank-val">7</div>
+      </div>
+
+      <!-- Lorenzo -->
+      <div class="rank-row">
+        <div class="rank-pos" style="font-size:12px;color:var(--sub)">6</div>
+        <div class="avatar">LZ</div>
+        <div class="rank-info">
+          <div class="rank-nome">Lorenzo Zanussi</div>
+          <div class="rank-sub">3 reuniões</div>
+        </div>
+        <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" style="width:20%"></div></div></div>
+        <div class="rank-val">3</div>
+      </div>
+    </div>
+
+    <!-- EXECUTIVOS -->
+    <div class="card">
+      <div class="card-title">Executivos — Receita Gerada</div>
+
+      <div class="exec-row">
+        <div class="rank-pos">🥇</div>
+        <div class="avatar" style="background:var(--gold-dim);border-color:var(--gold-brd);color:var(--gold)">GG</div>
+        <div class="exec-info" style="flex:1">
+          <div class="exec-nome">Gabriel Gracia</div>
+          <div class="exec-meta">3 fechamentos</div>
+        </div>
+        <div class="exec-val">R$ 8.190</div>
+      </div>
+
+      <div class="exec-row">
+        <div class="rank-pos">🥈</div>
+        <div class="avatar">GV</div>
+        <div class="exec-info" style="flex:1">
+          <div class="exec-nome">Gabriel Veiga</div>
+          <div class="exec-meta">1 fechamento</div>
+        </div>
+        <div class="exec-val">R$ 4.000</div>
+      </div>
+
+      <div class="exec-row">
+        <div class="rank-pos">🥉</div>
+        <div class="avatar">BG</div>
+        <div class="exec-info" style="flex:1">
+          <div class="exec-nome">Brenda Gino</div>
+          <div class="exec-meta">1 fechamento</div>
+        </div>
+        <div class="exec-val">R$ 1.500</div>
+      </div>
+
+      <div class="exec-row">
+        <div class="rank-pos" style="font-size:12px;color:var(--sub)">4</div>
+        <div class="avatar">LF</div>
+        <div class="exec-info" style="flex:1">
+          <div class="exec-nome">Luana Furtado</div>
+          <div class="exec-meta">0 fechamentos</div>
+        </div>
+        <div class="exec-val" style="color:var(--sub)">R$ 0</div>
+      </div>
+
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08)">
+        <div class="card-title" style="margin-bottom:10px">Diretores (fora do ranking)</div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-bottom:6px">
+          <span>Fábio Nunes</span>
+          <span>2 fechamentos · R$ 3.000</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FECHAMENTOS DO MÊS -->
+  <div class="card">
+    <div class="card-title">Todos os Fechamentos — Maio 2026</div>
+    <div class="grid-2" style="gap:0">
+      <div>
+        <div class="fech-row">
+          <div class="fech-dot"></div>
+          <div class="fech-info">
+            <div class="fech-nome">Grupo Tacla (Tradener)</div>
+            <div class="fech-exec">Gabriel Gracia &nbsp;·&nbsp; <span style="font-size:10px;color:rgba(139,195,74,0.7)">EDN: Luana</span></div>
+          </div>
+          <div style="text-align:right">
+            <div class="fech-val">R$ 6.000</div>
+            <div class="fech-data">04/05</div>
+          </div>
+        </div>
+        <div class="fech-row">
+          <div class="fech-dot"></div>
+          <div class="fech-info">
+            <div class="fech-nome">Bioxxi</div>
+            <div class="fech-exec">Gabriel Veiga</div>
+          </div>
+          <div style="text-align:right">
+            <div class="fech-val">R$ 4.000</div>
+            <div class="fech-data">08/05</div>
+          </div>
+        </div>
+        <div class="fech-row">
+          <div class="fech-dot"></div>
+          <div class="fech-info">
+            <div class="fech-nome">PRECICAST (Tradener)</div>
+            <div class="fech-exec">Gabriel Gracia &nbsp;·&nbsp; <span style="font-size:10px;color:rgba(139,195,74,0.7)">EDN: Jhonatas</span></div>
+          </div>
+          <div style="text-align:right">
+            <div class="fech-val">R$ 990</div>
+            <div class="fech-data">08/05</div>
+          </div>
+        </div>
+        <div class="fech-row">
+          <div class="fech-dot" style="background:rgba(255,255,255,0.25)"></div>
+          <div class="fech-info">
+            <div class="fech-nome">Viva! Campo Belo</div>
+            <div class="fech-exec" style="color:rgba(255,255,255,0.3)">Fábio Nunes (diretor)</div>
+          </div>
+          <div style="text-align:right">
+            <div class="fech-val" style="color:rgba(255,255,255,0.3)">R$ 1.000</div>
+            <div class="fech-data">09/05</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="fech-row">
+          <div class="fech-dot"></div>
+          <div class="fech-info">
+            <div class="fech-nome">Centro Adm. Rio Negro</div>
+            <div class="fech-exec">Gabriel Gracia &nbsp;·&nbsp; <span style="font-size:10px;color:rgba(139,195,74,0.7)">EDN: Luana</span></div>
+          </div>
+          <div style="text-align:right">
+            <div class="fech-val">R$ 1.200</div>
+            <div class="fech-data">19/05</div>
+          </div>
+        </div>
+        <div class="fech-row">
+          <div class="fech-dot" style="background:rgba(255,255,255,0.25)"></div>
+          <div class="fech-info">
+            <div class="fech-nome">Subcondominio Lake Victoria</div>
+            <div class="fech-exec" style="color:rgba(255,255,255,0.3)">Fábio Nunes (diretor)</div>
+          </div>
+          <div style="text-align:right">
+            <div class="fech-val" style="color:rgba(255,255,255,0.3)">R$ 2.000</div>
+            <div class="fech-data">20/05</div>
+          </div>
+        </div>
+        <div class="fech-row">
+          <div class="fech-dot"></div>
+          <div class="fech-info">
+            <div class="fech-nome">MIBA SP</div>
+            <div class="fech-exec">Brenda Gino</div>
+          </div>
+          <div style="text-align:right">
+            <div class="fech-val">R$ 1.500</div>
+            <div class="fech-data">04/05</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Velocidade da Lux 2.0 &nbsp;·&nbsp; Fechamento Maio 2026 &nbsp;·&nbsp; tcleffir.github.io/velocidade-lux
+</div>
+
+</body>
+</html>
