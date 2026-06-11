@@ -1090,6 +1090,8 @@ const DataService = {
       { nome: 'Brunno',   sobrenome: 'Meneguette', perfil: 'Executivo', id: 'exec2' },
       { nome: 'Luana',    sobrenome: 'Furtado',    perfil: 'Ambos',     id: 'exec3' },
       { nome: 'Gabriel',  sobrenome: 'Gracia',     perfil: 'Executivo', id: 'exec5' },
+      { nome: 'Eduardo',  sobrenome: 'Zahran',     perfil: 'Executivo', id: 'exec6' },
+      { nome: 'Larissa',  sobrenome: 'Almeida',    perfil: 'EDN',       id: 'edn7'  },
       { nome: 'Fábio',    sobrenome: '',           perfil: 'Executivo', id: 'execF', ocultarTelao: true },
       { nome: 'Thiago',   sobrenome: 'Tannuri',    perfil: 'Executivo', id: 'execT', ocultarTelao: true },
     ];
@@ -1215,10 +1217,14 @@ const DataService = {
     const _evJun = [
       { id:'_jf1',  vendedorId:_fid('Gabriel','Gracia'), data:'2026-06-02', tipo:'fechamento',        nomeCliente:'Centro Textil Internacional (ITM Expo)', cidadeEstado:'Lapa / SP', numUnidades:1, valorGestao:2000, ednId:null },
       { id:'_jf2',  vendedorId:_fid('Gabriel','Gracia'), data:'2026-06-10', tipo:'fechamento',        nomeCliente:'Vitrine Iguatemi',                        cidadeEstado:'',          numUnidades:1, valorGestao:3500, ednId:null },
+      { id:'_jf3',  vendedorId:_fid('Brunno'),           data:'2026-06-09', tipo:'fechamento',        nomeCliente:'BVEP (Gestão de GD)',                     cidadeEstado:'',          numUnidades:1, valorGestao:800,  ednId:null },
       { id:'_jr1a', vendedorId:_fid('Luana'),            data:'2026-06-02', tipo:'reuniao_realizada' },
       { id:'_jr1b', vendedorId:_fid('Luana'),            data:'2026-06-02', tipo:'reuniao_realizada' },
       { id:'_jr1c', vendedorId:_fid('Jhonatas'),         data:'2026-06-02', tipo:'reuniao_realizada' },
-      { id:'_jr2a', vendedorId:_fid('Gabriel','Veiga'), data:'2026-06-10', tipo:'reuniao_realizada' },
+      { id:'_jr1d', vendedorId:_fid('Jhonatas'),         data:'2026-06-10', tipo:'reuniao_realizada' },
+      { id:'_jr2a', vendedorId:_fid('Gabriel','Veiga'),  data:'2026-06-10', tipo:'reuniao_realizada' },
+      { id:'_jr3a', vendedorId:_fid('Giovanna'),         data:'2026-06-10', tipo:'reuniao_realizada' },
+      { id:'_jr3b', vendedorId:_fid('Giovanna'),         data:'2026-06-10', tipo:'reuniao_realizada' },
     ].filter(e => e.vendedorId);
 
     // Remove eventos de Maio e Junho antigos e re-injeta Junho (determinístico)
@@ -1229,6 +1235,7 @@ const DataService = {
 
     /* Migração 10b: Cards de Últimos Fechamentos do Mês — Junho 2026 */
     this._cache.ultimos_fechamentos = [
+      { cliente: 'BVEP (Gestão de GD)',                     executivo: 'Brunno Meneguette',            valor: 800,  data: '09/06/2026' },
       { cliente: 'Vitrine Iguatemi',                        executivo: 'Gabriel Gracia',               valor: 3500, data: '10/06/2026' },
       { cliente: 'Centro Textil Internacional (ITM Expo)', executivo: 'Gabriel Gracia / Fábio Nunes', valor: 2000, data: '02/06/2026' },
     ];
@@ -1658,6 +1665,25 @@ const UltrapassagemState = {
 };
 
 /* ====================================================================
+   FLAGS DA COPA — bandeiras por vendedor ID (Copa do Mundo 2026)
+==================================================================== */
+const _FLAGS = {
+  'edn2':  '🇩🇪', // Caio       — Alemanha
+  'edn3':  '🇯🇵', // Giovanna   — Japão
+  'edn4':  '🇫🇷', // Jhonatas   — França
+  'edn5':  '🇨🇮', // Veiga      — Costa do Marfim
+  'edn6':  '🇭🇷', // Lorenzo    — Croácia
+  'edn7':  '🇦🇷', // Larissa    — Argentina
+  'exec1': '🇰🇷', // Brenda     — Coreia do Sul
+  'exec2': '🇵🇹', // Brunno     — Portugal
+  'exec3': '🇧🇪', // Luana      — Bélgica
+  'exec5': '🇧🇷', // Gracia     — Brasil
+  'exec6': '🇲🇽', // Eduardo    — México
+  'exec7': '🇪🇬', // Gabriela   — Egito
+  'execT': '🇳🇱', // Tata       — Holanda
+};
+
+/* ====================================================================
    RENDERERS — funções de renderização de cada quadrante
 ==================================================================== */
 const Renderers = {
@@ -1680,7 +1706,7 @@ const Renderers = {
     const _ASSIST = { 'edn4': 1 }; // Jhonatas: 🔥 prospecção Vitrine Iguatemi
 
     // Geração Distribuída Junho 2026: cada GD vale +1 no ranking
-    const _GD = {}; // Adicionar conforme fechamentos GD ocorrerem
+    const _GD = { 'exec2': 1 }; // Brunno: ☀️ BVEP GD
 
     // Senioridade elevada — destaque visual no card
     const _SENIOR = new Set(['exec3', 'edn4']); // Luana, Jhonatas
@@ -1730,9 +1756,12 @@ const Renderers = {
       const up        = mudancas[s.vendedor.id];
       const assists   = _ASSIST[s.vendedor.id] || 0;
       const gds       = _GD[s.vendedor.id] || 0;
+      const _flag = _FLAGS[s.vendedor.id];
       const avatarHTML = s.vendedor.foto
         ? `<div class="avatar"><img src="${s.vendedor.foto}" alt=""></div>`
-        : `<div class="avatar">${Utils.iniciais(s.vendedor.nome + ' ' + s.vendedor.sobrenome)}</div>`;
+        : _flag
+          ? `<div class="avatar" style="font-size:20px;background:none;border-color:rgba(255,255,255,0.25)">${_flag}</div>`
+          : `<div class="avatar">${Utils.iniciais(s.vendedor.nome + ' ' + s.vendedor.sobrenome)}</div>`;
 
       return `
         <div class="pessoa-row ${classe}">
@@ -1766,6 +1795,9 @@ const Renderers = {
     const container = document.getElementById('ranking-execs');
     if (!container) return;
 
+    // GD de Executivos (badge visual apenas — não afeta score)
+    const _GD_EXEC = { 'exec2': 1 }; // Brunno: ☀️ BVEP GD
+
     if (!ranking.length) {
       container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div>Nenhum Executivo cadastrado</div>';
       return;
@@ -1784,16 +1816,20 @@ const Renderers = {
       const pos    = _posExec[i];
       const classe = pos === 1 ? 'destaque-exec' : 'normal';
       const medal  = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : null;
+      const _flagEx = _FLAGS[s.vendedor.id];
       const avatarHTML = s.vendedor.foto
         ? `<div class="avatar"><img src="${s.vendedor.foto}" alt=""></div>`
-        : `<div class="avatar">${Utils.iniciais(s.vendedor.nome + ' ' + s.vendedor.sobrenome)}</div>`;
+        : _flagEx
+          ? `<div class="avatar" style="font-size:20px;background:none;border-color:rgba(255,255,255,0.25)">${_flagEx}</div>`
+          : `<div class="avatar">${Utils.iniciais(s.vendedor.nome + ' ' + s.vendedor.sobrenome)}</div>`;
+      const gdEx = (_GD_EXEC || {})[s.vendedor.id] || 0;
 
       return `
         <div class="pessoa-row ${classe}">
           ${medal ? `<span class="medal-badge">${medal}</span>` : `<span class="pos-num">${i+1}</span>`}
           ${avatarHTML}
           <div class="pessoa-info">
-            <div class="pessoa-nome">${s.vendedor.nome} ${s.vendedor.sobrenome}</div>
+            <div class="pessoa-nome">${s.vendedor.nome} ${s.vendedor.sobrenome}${gdEx ? ` <span class="gd-badge"><span class="gd-icon">☀️</span><span class="gd-num">${gdEx}</span></span>` : ''}</div>
             <div class="pessoa-sub">${s.fechamentos} fech. · ${Utils.formataMoeda(s.totalReceita)}</div>
           </div>
           <div class="pessoa-valor" style="font-size:10px;min-width:60px">${Utils.formataMoeda(s.totalReceita)}</div>
@@ -1820,7 +1856,7 @@ const Renderers = {
 
     const cards = [
       { key: 'reunioes',    icone: '🤝', categoria: 'Mais Reuniões',    labelSufixo: 'Reuniões'    },
-      { key: 'fechamentos', icone: '🏆', categoria: 'Mais Fechamentos', labelSufixo: 'Fechamentos' },
+      { key: 'fechamentos', icone: '<span style="position:relative;display:inline-block;line-height:1">🏆<span style="position:absolute;bottom:-2px;right:-5px;font-size:9px">⚽</span></span>', categoria: 'Mais Fechamentos', labelSufixo: 'Fechamentos' },
       { key: 'receita',     icone: '💰', categoria: 'Maior Receita',    labelSufixo: '',            isMoeda: true },
     ];
 
@@ -1836,6 +1872,11 @@ const Renderers = {
             <div class="dest-nome" style="color:rgba(255,255,255,0.35)">A definir</div>
           </div>`;
         const iniciais = Utils.iniciais(info.nome || '?');
+        const _mDest = Store.getEquipe().find(v => {
+          const full = (v.nome + ' ' + v.sobrenome).trim();
+          return full === (info.nome || '').trim() || v.nome === (info.nome || '').trim().split(' ')[0];
+        });
+        const _flagDest = _mDest ? (_FLAGS[_mDest.id] || null) : null;
         /* Sem duplicidade: número e label juntos, tudo verde e mesmo tamanho */
         const valorFmt = c.isMoeda
           ? Utils.formataMoeda(info.valor)
@@ -1844,7 +1885,9 @@ const Renderers = {
           <div class="destaque-row glass glass-green">
             <div class="dest-icone">${c.icone}</div>
             <div class="dest-categoria">${c.categoria}</div>
-            <div class="dest-avatar">${iniciais}</div>
+            ${_flagDest
+              ? `<div class="dest-avatar" style="font-size:24px;background:none;border-color:rgba(255,255,255,0.25)">${_flagDest}</div>`
+              : `<div class="dest-avatar">${iniciais}</div>`}
             <div class="dest-nome">${info.nome || '—'}</div>
             <div class="dest-valor">${valorFmt}</div>
           </div>`;
@@ -2034,6 +2077,8 @@ const DemoData = {
       { id: 'exec2', nome: 'Brunno',   sobrenome: 'Meneguette', perfil: 'Executivo', foto: null },
       { id: 'exec3', nome: 'Luana',    sobrenome: 'Furtado',    perfil: 'Ambos',     foto: null },
       { id: 'exec5', nome: 'Gabriel',  sobrenome: 'Gracia',     perfil: 'Executivo', foto: null },
+      { id: 'exec6', nome: 'Eduardo',  sobrenome: 'Zahran',     perfil: 'Executivo', foto: null },
+      { id: 'edn7',  nome: 'Larissa',  sobrenome: 'Almeida',    perfil: 'EDN',       foto: null },
       { id: 'execF', nome: 'Fábio',    sobrenome: '',           perfil: 'Executivo', foto: null, ocultarTelao: true },
     ];
 
