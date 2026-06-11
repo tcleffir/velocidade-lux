@@ -1877,10 +1877,9 @@ const Renderers = {
             <div class="dest-nome" style="color:rgba(255,255,255,0.35)">A definir</div>
           </div>`;
         const iniciais = Utils.iniciais(info.nome || '?');
-        const _mDest = DataService.getVendedores().find(v => {
-          const full = (v.nome + ' ' + v.sobrenome).trim();
-          return full === (info.nome || '').trim() || v.nome === (info.nome || '').trim().split(' ')[0];
-        });
+        const _mDest = DataService.getVendedores().find(v =>
+          (v.nome + ' ' + v.sobrenome).trim() === (info.nome || '').trim()
+        );
         const _fiDest = _mDest ? _flagImg(_mDest.id, 40) : null;
         /* Sem duplicidade: número e label juntos, tudo verde e mesmo tamanho */
         const valorFmt = c.isMoeda
