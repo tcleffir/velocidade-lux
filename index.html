@@ -1667,20 +1667,25 @@ const UltrapassagemState = {
 /* ====================================================================
    FLAGS DA COPA — bandeiras por vendedor ID (Copa do Mundo 2026)
 ==================================================================== */
+/* Códigos ISO 3166-1 alpha-2 para flagcdn.com/w40/{code}.png */
 const _FLAGS = {
-  'edn2':  '🇩🇪', // Caio       — Alemanha
-  'edn3':  '🇯🇵', // Giovanna   — Japão
-  'edn4':  '🇫🇷', // Jhonatas   — França
-  'edn5':  '🇨🇮', // Veiga      — Costa do Marfim
-  'edn6':  '🇭🇷', // Lorenzo    — Croácia
-  'edn7':  '🇦🇷', // Larissa    — Argentina
-  'exec1': '🇰🇷', // Brenda     — Coreia do Sul
-  'exec2': '🇵🇹', // Brunno     — Portugal
-  'exec3': '🇧🇪', // Luana      — Bélgica
-  'exec5': '🇧🇷', // Gracia     — Brasil
-  'exec6': '🇲🇽', // Eduardo    — México
-  'exec7': '🇪🇬', // Gabriela   — Egito
-  'execT': '🇳🇱', // Tata       — Holanda
+  'edn2':  'de', // Caio       — Alemanha
+  'edn3':  'jp', // Giovanna   — Japão
+  'edn4':  'fr', // Jhonatas   — França
+  'edn5':  'ci', // Veiga      — Costa do Marfim
+  'edn6':  'hr', // Lorenzo    — Croácia
+  'edn7':  'ar', // Larissa    — Argentina
+  'exec1': 'kr', // Brenda     — Coreia do Sul
+  'exec2': 'pt', // Brunno     — Portugal
+  'exec3': 'be', // Luana      — Bélgica
+  'exec5': 'br', // Gracia     — Brasil
+  'exec6': 'mx', // Eduardo    — México
+  'exec7': 'eg', // Gabriela   — Egito
+  'execT': 'nl', // Tata       — Holanda
+};
+const _flagImg = (id, size) => {
+  const c = _FLAGS[id];
+  return c ? `<img src="https://flagcdn.com/w${size||40}/${c}.png" style="width:100%;height:100%;object-fit:cover;display:block" alt="">` : null;
 };
 
 /* ====================================================================
@@ -1756,11 +1761,11 @@ const Renderers = {
       const up        = mudancas[s.vendedor.id];
       const assists   = _ASSIST[s.vendedor.id] || 0;
       const gds       = _GD[s.vendedor.id] || 0;
-      const _flag = _FLAGS[s.vendedor.id];
+      const _fi = _flagImg(s.vendedor.id, 40);
       const avatarHTML = s.vendedor.foto
         ? `<div class="avatar"><img src="${s.vendedor.foto}" alt=""></div>`
-        : _flag
-          ? `<div class="avatar" style="font-size:20px;background:none;border-color:rgba(255,255,255,0.25)">${_flag}</div>`
+        : _fi
+          ? `<div class="avatar" style="padding:0;overflow:hidden;background:none;border-color:rgba(255,255,255,0.3)">${_fi}</div>`
           : `<div class="avatar">${Utils.iniciais(s.vendedor.nome + ' ' + s.vendedor.sobrenome)}</div>`;
 
       return `
@@ -1816,11 +1821,11 @@ const Renderers = {
       const pos    = _posExec[i];
       const classe = pos === 1 ? 'destaque-exec' : 'normal';
       const medal  = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : null;
-      const _flagEx = _FLAGS[s.vendedor.id];
+      const _fiEx = _flagImg(s.vendedor.id, 40);
       const avatarHTML = s.vendedor.foto
         ? `<div class="avatar"><img src="${s.vendedor.foto}" alt=""></div>`
-        : _flagEx
-          ? `<div class="avatar" style="font-size:20px;background:none;border-color:rgba(255,255,255,0.25)">${_flagEx}</div>`
+        : _fiEx
+          ? `<div class="avatar" style="padding:0;overflow:hidden;background:none;border-color:rgba(255,255,255,0.3)">${_fiEx}</div>`
           : `<div class="avatar">${Utils.iniciais(s.vendedor.nome + ' ' + s.vendedor.sobrenome)}</div>`;
       const gdEx = (_GD_EXEC || {})[s.vendedor.id] || 0;
 
@@ -1872,11 +1877,11 @@ const Renderers = {
             <div class="dest-nome" style="color:rgba(255,255,255,0.35)">A definir</div>
           </div>`;
         const iniciais = Utils.iniciais(info.nome || '?');
-        const _mDest = Store.getEquipe().find(v => {
+        const _mDest = DataService.getVendedores().find(v => {
           const full = (v.nome + ' ' + v.sobrenome).trim();
           return full === (info.nome || '').trim() || v.nome === (info.nome || '').trim().split(' ')[0];
         });
-        const _flagDest = _mDest ? (_FLAGS[_mDest.id] || null) : null;
+        const _fiDest = _mDest ? _flagImg(_mDest.id, 40) : null;
         /* Sem duplicidade: número e label juntos, tudo verde e mesmo tamanho */
         const valorFmt = c.isMoeda
           ? Utils.formataMoeda(info.valor)
@@ -1885,8 +1890,8 @@ const Renderers = {
           <div class="destaque-row glass glass-green">
             <div class="dest-icone">${c.icone}</div>
             <div class="dest-categoria">${c.categoria}</div>
-            ${_flagDest
-              ? `<div class="dest-avatar" style="font-size:24px;background:none;border-color:rgba(255,255,255,0.25)">${_flagDest}</div>`
+            ${_fiDest
+              ? `<div class="dest-avatar" style="padding:0;overflow:hidden;background:none;border-color:rgba(255,255,255,0.3)">${_fiDest}</div>`
               : `<div class="dest-avatar">${iniciais}</div>`}
             <div class="dest-nome">${info.nome || '—'}</div>
             <div class="dest-valor">${valorFmt}</div>
