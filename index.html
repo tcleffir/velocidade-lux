@@ -1241,7 +1241,8 @@ const DataService = {
       { id:'_jr1m', vendedorId:_fid('Jhonatas'),         data:'2026-06-19', tipo:'reuniao_realizada' },
       { id:'_jr1n', vendedorId:_fid('Jhonatas'),         data:'2026-06-19', tipo:'reuniao_realizada' },
       { id:'_jr5b', vendedorId:_fid('Larissa'),          data:'2026-06-19', tipo:'reuniao_realizada' },
-      { id:'_jf4',  vendedorId:_fid('Thiago'),           data:'2026-06-15', tipo:'fechamento', nomeCliente:'Supermercado Vovó Zuzu', cidadeEstado:'', numUnidades:2, valorGestao:2000, ednId:null },
+      { id:'_jf4',  vendedorId:_fid('Thiago'),           data:'2026-06-15', tipo:'fechamento', nomeCliente:'Supermercado Vovó Zuzu', cidadeEstado:'', numUnidades:2,  valorGestao:2000, ednId:null },
+      { id:'_jf5',  vendedorId:_fid('Thiago'),           data:'2026-06-22', tipo:'fechamento', nomeCliente:"Ad'Oro",                  cidadeEstado:'', numUnidades:27, valorGestao:5400, ednId:null },
     ].filter(e => e.vendedorId);
 
     // Remove eventos de Maio e Junho antigos e re-injeta Junho (determinístico)
@@ -1252,10 +1253,9 @@ const DataService = {
 
     /* Migração 10b: Cards de Últimos Fechamentos do Mês — Junho 2026 */
     this._cache.ultimos_fechamentos = [
-      { cliente: 'Supermercado Vovó Zuzu',                  executivo: 'Thiago Tannuri / Time Gestão', valor: 2000, data: '15/06/2026' },
-      { cliente: 'BVEP (Gestão de GD)',                     executivo: 'Brunno Meneguette',            valor: 800,  data: '09/06/2026' },
-      { cliente: 'Vitrine Iguatemi',                        executivo: 'Gabriel Gracia',               valor: 3500, data: '10/06/2026' },
-      { cliente: 'Centro Textil Internacional (ITM Expo)', executivo: 'Gabriel Gracia / Fábio Nunes', valor: 2000, data: '02/06/2026' },
+      { cliente: "Ad'Oro",               executivo: 'Thiago Tannuri / Time Gestão', valor: 5400, data: '22/06/2026' },
+      { cliente: 'Supermercado Vovó Zuzu', executivo: 'Thiago Tannuri / Time Gestão', valor: 2000, data: '15/06/2026' },
+      { cliente: 'BVEP (Gestão de GD)',  executivo: 'Brunno Meneguette',            valor: 800,  data: '09/06/2026' },
     ];
 
     /* Migração 12: Histórico 2025 e 2026 — CLÁUSULA PÉTREA
