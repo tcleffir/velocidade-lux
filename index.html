@@ -236,6 +236,42 @@
     }
     .pessoa-row.destaque-exec { background: var(--glass-gold); border: 1px solid var(--glass-gold-border); }
 
+    /* META BATIDA — celebração 🎯 */
+    .pessoa-row.meta-atingida {
+      border: 2px solid rgba(0, 255, 120, 0.90) !important;
+      background: linear-gradient(105deg,
+        rgba(0, 200, 80, 0.38) 0%,
+        rgba(0, 255, 130, 0.22) 45%,
+        rgba(0, 180, 70, 0.18) 100%) !important;
+      box-shadow: 0 0 28px rgba(0, 255, 100, 0.55),
+                  0 0 60px rgba(0, 255, 100, 0.20),
+                  inset 0 1px 0 rgba(150, 255, 180, 0.40) !important;
+      animation: metaPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes metaPulse {
+      0%, 100% { box-shadow: 0 0 22px rgba(0,255,100,0.45), 0 0 50px rgba(0,255,100,0.15), inset 0 1px 0 rgba(150,255,180,0.35); }
+      50%       { box-shadow: 0 0 45px rgba(0,255,100,0.85), 0 0 90px rgba(0,255,100,0.35), inset 0 1px 0 rgba(150,255,180,0.60); }
+    }
+    .pessoa-row.meta-atingida .pessoa-nome,
+    .pessoa-row.meta-atingida .pessoa-valor {
+      color: #7bffb8 !important;
+      text-shadow: 0 0 14px rgba(0, 255, 110, 0.80) !important;
+    }
+    .meta-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      background: rgba(0, 255, 100, 0.22);
+      border: 1px solid rgba(0, 255, 100, 0.65);
+      border-radius: 10px; padding: 1px 8px;
+      font-size: 10px; font-weight: 800;
+      color: #7bffb8; letter-spacing: 0.6px;
+      margin-left: 6px; vertical-align: middle;
+      animation: metaBadgeFlash 1.4s ease-in-out infinite;
+    }
+    @keyframes metaBadgeFlash {
+      0%, 100% { opacity: 1;   transform: scale(1); }
+      50%       { opacity: 0.7; transform: scale(1.06); }
+    }
+
     .medal-badge { font-size: 18px; flex-shrink: 0; width: 20px; text-align: center; }
     .pos-num { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.35); width: 16px; text-align: center; flex-shrink: 0; }
 
@@ -1241,6 +1277,9 @@ const DataService = {
       { id:'_jr1m', vendedorId:_fid('Jhonatas'),         data:'2026-06-19', tipo:'reuniao_realizada' },
       { id:'_jr1n', vendedorId:_fid('Jhonatas'),         data:'2026-06-19', tipo:'reuniao_realizada' },
       { id:'_jr5b', vendedorId:_fid('Larissa'),          data:'2026-06-19', tipo:'reuniao_realizada' },
+      { id:'_jr1o', vendedorId:_fid('Jhonatas'),         data:'2026-06-22', tipo:'reuniao_realizada' },
+      { id:'_jr1p', vendedorId:_fid('Jhonatas'),         data:'2026-06-22', tipo:'reuniao_realizada' },
+      { id:'_jr1q', vendedorId:_fid('Jhonatas'),         data:'2026-06-22', tipo:'reuniao_realizada' },
       { id:'_jf4',  vendedorId:_fid('Thiago'),           data:'2026-06-15', tipo:'fechamento', nomeCliente:'Supermercado Vovó Zuzu', cidadeEstado:'', numUnidades:2,  valorGestao:2000, ednId:null },
       { id:'_jf5',  vendedorId:_fid('Thiago'),           data:'2026-06-22', tipo:'fechamento', nomeCliente:"Ad'Oro",                  cidadeEstado:'', numUnidades:27, valorGestao:5400, ednId:null },
     ].filter(e => e.vendedorId);
@@ -1733,6 +1772,7 @@ const Renderers = {
 
     // Senioridade elevada — destaque visual no card
     const _SENIOR = new Set(['exec3', 'edn4']); // Luana, Jhonatas
+    const _META   = new Set(['edn4']); // Jhonatas: META BATIDA 🎯
 
     // Acelerador de carreira: mapa com quantidade de foguetes por vendedor
     const _ACCEL = {
@@ -1772,7 +1812,9 @@ const Renderers = {
     container.innerHTML = rankingOrdenado.slice(0, 7).map((s, i) => {
       const pos       = _posEDN[i];
       const classePos = pos === 1 ? 'ouro' : pos === 2 ? 'prata' : pos === 3 ? 'bronze' : 'normal';
-      const classe    = _SENIOR.has(s.vendedor.id) ? `${classePos} senior` : classePos;
+      const classeSenior = _SENIOR.has(s.vendedor.id) ? ' senior' : '';
+      const classeMeta   = _META.has(s.vendedor.id)   ? ' meta-atingida' : '';
+      const classe = `${classePos}${classeSenior}${classeMeta}`;
       const medal     = pos === 1 ? '🥇'  : pos === 2 ? '🥈'   : pos === 3 ? '🥉'     : null;
       const scoreVal  = score(s);
       const pct       = maxVal > 0 ? Math.round((scoreVal / maxVal) * 100) : 0;
@@ -1793,6 +1835,7 @@ const Renderers = {
           <div class="pessoa-info">
             <div class="pessoa-nome">
               ${s.vendedor.nome} ${s.vendedor.sobrenome}
+              ${_META.has(s.vendedor.id) ? `<span class="meta-badge">🎯 META!</span>` : ''}
               ${assists ? `<span class="assist-badge"><span class="assist-icon">🔥</span><span class="assist-num">${assists}</span></span>` : ''}
               ${gds ? `<span class="gd-badge"><span class="gd-icon">☀️</span><span class="gd-num">${gds}</span></span>` : ''}
               ${(_ACCEL[s.vendedor.id] || 0) > 0 ? `<span class="accel-badge">🚀${_ACCEL[s.vendedor.id] > 1 ? `<span style="font-size:9px;margin-left:1px">${_ACCEL[s.vendedor.id]}</span>` : ''}</span>` : ''}
