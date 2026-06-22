@@ -1238,6 +1238,9 @@ const DataService = {
       { id:'_jr5a', vendedorId:_fid('Larissa'),          data:'2026-06-17', tipo:'reuniao_realizada' },
       { id:'_jr4d', vendedorId:_fid('Caio'),             data:'2026-06-18', tipo:'reuniao_realizada' },
       { id:'_jr1l', vendedorId:_fid('Jhonatas'),         data:'2026-06-18', tipo:'reuniao_realizada' },
+      { id:'_jr1m', vendedorId:_fid('Jhonatas'),         data:'2026-06-19', tipo:'reuniao_realizada' },
+      { id:'_jr1n', vendedorId:_fid('Jhonatas'),         data:'2026-06-19', tipo:'reuniao_realizada' },
+      { id:'_jr5b', vendedorId:_fid('Larissa'),          data:'2026-06-19', tipo:'reuniao_realizada' },
       { id:'_jf4',  vendedorId:_fid('Thiago'),           data:'2026-06-15', tipo:'fechamento', nomeCliente:'Supermercado Vovó Zuzu', cidadeEstado:'', numUnidades:2, valorGestao:2000, ednId:null },
     ].filter(e => e.vendedorId);
 
@@ -1723,7 +1726,7 @@ const Renderers = {
     if (!container) return;
 
     // Assistencias Junho 2026: foguinhos apenas quando há prospeccao de fechamento no mes
-    const _ASSIST = { 'edn4': 1 }; // Jhonatas: 🔥 prospecção Vitrine Iguatemi
+    const _ASSIST = { 'edn4': 2 }; // Jhonatas: 🔥🔥 Vitrine Iguatemi + nova prospecção
 
     // Geração Distribuída Junho 2026: cada GD vale +1 no ranking
     const _GD = { 'exec2': 1 }; // Brunno: ☀️ BVEP GD
