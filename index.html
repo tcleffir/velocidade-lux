@@ -1098,11 +1098,10 @@ const DataService = {
       if (v.nome === 'Fábio' && !v.ocultarTelao) v.ocultarTelao = true;
     });
 
-    /* Migração 8: Garante Lorenzo Zanussi no time (EDN) */
-    const _lorenzo = this._cache.equipe.find(v => v.nome === 'Lorenzo');
-    if (!_lorenzo) {
-      this._cache.equipe.push({ id: 'edn6', nome: 'Lorenzo', sobrenome: 'Zanussi', perfil: 'EDN', foto: null });
-    } else if (!_lorenzo.sobrenome) {
+    /* Migração 8: Lorenzo Zanussi — desligado, migração neutralizada */
+    const _lorenzo = null; // removido
+    if (false) {
+    } else if (false) {
       _lorenzo.sobrenome = 'Zanussi';
     }
 
@@ -2140,7 +2139,6 @@ const DemoData = {
       { id: 'edn3',  nome: 'Giovanna', sobrenome: 'Bispo',    perfil: 'EDN',       foto: null },
       { id: 'edn4',  nome: 'Jhonatas', sobrenome: 'Baldez',   perfil: 'EDN',       foto: null },
       { id: 'edn5',  nome: 'Gabriel',  sobrenome: 'Veiga',    perfil: 'EDN',       foto: null },
-      { id: 'edn6',  nome: 'Lorenzo',  sobrenome: 'Zanussi',  perfil: 'EDN',       foto: null },
       { id: 'exec1', nome: 'Brenda',   sobrenome: 'Gino',       perfil: 'Executivo', foto: null },
       { id: 'exec2', nome: 'Brunno',   sobrenome: 'Meneguette', perfil: 'Executivo', foto: null },
       { id: 'exec3', nome: 'Luana',    sobrenome: 'Furtado',    perfil: 'Ambos',     foto: null },
