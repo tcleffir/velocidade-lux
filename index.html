@@ -1121,7 +1121,6 @@ const DataService = {
       { nome: 'Giovanna', sobrenome: 'Bispo',      perfil: 'EDN',       id: 'edn3'  },
       { nome: 'Jhonatas', sobrenome: 'Baldez',     perfil: 'EDN',       id: 'edn4'  },
       { nome: 'Gabriel',  sobrenome: 'Veiga',      perfil: 'EDN',       id: 'edn5'  },
-      { nome: 'Lorenzo',  sobrenome: 'Zanussi',    perfil: 'EDN',       id: 'edn6'  },
       { nome: 'Brenda',   sobrenome: 'Gino',       perfil: 'Executivo', id: 'exec1' },
       { nome: 'Brunno',   sobrenome: 'Meneguette', perfil: 'Executivo', id: 'exec2' },
       { nome: 'Luana',    sobrenome: 'Furtado',    perfil: 'Ambos',     id: 'exec3' },
@@ -1147,6 +1146,9 @@ const DataService = {
 
     /* Migração 13: Remove Bianca Oliveira (edn1) — desligada */
     this._cache.equipe = this._cache.equipe.filter(m => m.id !== 'edn1');
+
+    /* Migração 14: Remove Lorenzo Zanussi (edn6) — desligado */
+    this._cache.equipe = this._cache.equipe.filter(m => m.id !== 'edn6');
 
     /* Migração 10: Substitui eventos de Abril 2026 com dados reais corretos
        O Gist pode ter dados incompletos — esta migração garante os valores certos. */
