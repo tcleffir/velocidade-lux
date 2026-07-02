@@ -1073,14 +1073,14 @@ const DataService = {
       if (!m.fechamentosPorExecutivo) m.fechamentosPorExecutivo = 2;
     }
 
-    /* Migração 6: Destaques de Maio 2026 (dados reais) */
+    /* Migração 6: Destaques de Junho 2026 (dados reais) */
     const d = this._cache.destaques_anterior;
-    if (!d || !d.mes || d.mes !== 'Maio 2026') {
+    if (!d || !d.mes || d.mes !== 'Junho 2026') {
       this._cache.destaques_anterior = {
-        mes: 'Maio 2026',
-        reunioes:    { nome: 'Luana Furtado',  valor: 15   },
-        fechamentos: { nome: 'Gabriel Gracia', valor: 3    },
-        receita:     { nome: 'Gabriel Gracia', valor: 8190 },
+        mes: 'Junho 2026',
+        reunioes:    { nome: 'Jhonatas Baldez', valor: 10   },
+        fechamentos: { nome: 'Gabriel Gracia',  valor: 3    },
+        receita:     { nome: 'Gabriel Gracia',  valor: 8300 },
       };
       localStorage.setItem('lux_destaques_anterior', JSON.stringify(this._cache.destaques_anterior));
     }
@@ -1295,17 +1295,23 @@ const DataService = {
       { id:'_jf5',  vendedorId:_fid('Thiago'),           data:'2026-06-22', tipo:'fechamento', nomeCliente:"Ad'Oro",                  cidadeEstado:'', numUnidades:27, valorGestao:5400, ednId:null },
     ].filter(e => e.vendedorId);
 
-    // Remove eventos de Maio e Junho antigos e re-injeta Junho (determinístico)
-    this._cache.eventos = this._cache.eventos.filter(e =>
-      !(e.data && (e.data.startsWith('2026-05-') || e.data.startsWith('2026-06-')))
-    );
-    _evJun.forEach(e => this._cache.eventos.push(e));
+    /* Eventos de Julho 2026 — ranking ao vivo de Julho */
+    const _evJul = [
+      { id:'_jl1a', vendedorId:_fid('Luana'),   data:'2026-07-02', tipo:'reuniao_realizada' },
+      { id:'_jl5a', vendedorId:_fid('Larissa'), data:'2026-07-02', tipo:'reuniao_realizada' },
+      { id:'_jlf1', vendedorId:_fid('Thiago'),  data:'2026-07-02', tipo:'fechamento', nomeCliente:'Buckman Chemistry', cidadeEstado:'', numUnidades:1, valorGestao:1800, ednId:null },
+    ].filter(e => e.vendedorId);
 
-    /* Migração 10b: Cards de Últimos Fechamentos do Mês — Junho 2026 */
+    // Remove eventos de Junho e Julho antigos e re-injeta Julho (determinístico)
+    // Junho agora é histórico: travado em _H26_REUN[5]=35 e _H26_FECH[5]=6
+    this._cache.eventos = this._cache.eventos.filter(e =>
+      !(e.data && (e.data.startsWith('2026-06-') || e.data.startsWith('2026-07-')))
+    );
+    _evJul.forEach(e => this._cache.eventos.push(e));
+
+    /* Migração 10b: Cards de Últimos Fechamentos do Mês — Julho 2026 */
     this._cache.ultimos_fechamentos = [
-      { cliente: 'Instituto do Sono',      executivo: 'Gabriel Gracia / Fábio Nunes', valor: 2800, data: '26/06/2026' },
-      { cliente: "Ad'Oro",                 executivo: 'Thiago Tannuri / Time Gestão', valor: 5400, data: '22/06/2026' },
-      { cliente: 'Supermercado Vovó Zuzu', executivo: 'Thiago Tannuri / Time Gestão', valor: 2000, data: '15/06/2026' },
+      { cliente: 'Buckman Chemistry', executivo: 'Thiago Tannuri', valor: 1800, data: '02/07/2026' },
     ];
 
     /* Migração 12: Histórico 2025 e 2026 — CLÁUSULA PÉTREA
@@ -1316,8 +1322,8 @@ const DataService = {
     this._cache.historico_2025.fechamentos = _H25_FECH;
 
     /* Histórico 2026: Jan-Mar são dados reais fixos; Abr em diante usa live */
-    const _H26_REUN = [21, 32, 36, 62, 46,  0,  0,  0,  0,  0,  0,  0]; // Mai=46 (Luana11+Caio9+Veiga8+Jhon8+Giov7+Lor3)
-    const _H26_FECH = [10,  0,  2, 10,  7,  0,  0,  0,  0,  0,  0,  0]; // Mai=7 (GGracia3+Brenda1+Veiga1+Fabio2)
+    const _H26_REUN = [21, 32, 36, 62, 46, 35,  0,  0,  0,  0,  0,  0]; // Jun=35 (Jhon10+Luana8+Caio7+Giov6+Veiga2+Larissa2)
+    const _H26_FECH = [10,  0,  2, 10,  7,  6,  0,  0,  0,  0,  0,  0]; // Jun=6 (CentroTextil+Vitrine+BVEP+VovoZuzu+AdOro+Instituto)
     _H26_REUN.forEach((v, i) => { if (v > 0) this._cache.historico_2026.reunioes[i]    = v; });
     _H26_FECH.forEach((v, i) => { if (v > 0) this._cache.historico_2026.fechamentos[i] = v; });
   },
@@ -1496,9 +1502,9 @@ const RankingEngine = {
     const hist26  = DataService.getHistorico2026();
     const eventos = DataService.getEventos();
     const metas   = DataService.getMetas();
-    /* MES_DISPLAY: mês de referência do gráfico (0=Jan … 5=Jun).
-       Para avançar para Julho: mudar para Math.min(Utils.mesAtual(), 6)          */
-    const mesAtual = Math.min(Utils.mesAtual(), 5); // Junho = índice 5
+    /* MES_DISPLAY: mês de referência do gráfico (0=Jan … 6=Jul).
+       Para avançar para Agosto: mudar para Math.min(Utils.mesAtual(), 7)          */
+    const mesAtual = Math.min(Utils.mesAtual(), 6); // Julho = índice 6
 
     /* Contagem ao vivo de 2026 a partir dos eventos */
     const reunioes2026_live    = Array(12).fill(0);
@@ -1612,9 +1618,9 @@ const Charts = {
     };
   },
 
-  /* Exibe apenas 6 meses: Fev(1) a Jul(6) */
-  CHART_INICIO: 2, // Mar
-  CHART_FIM:    8, // Ago (exclusive)
+  /* Exibe apenas 6 meses: Abr(3) a Set(8) */
+  CHART_INICIO: 3, // Abr
+  CHART_FIM:    9, // Set (exclusive)
 
   renderizar(dados) {
     const { reunioes, fechamentos, mesAtual } = dados;
@@ -1775,21 +1781,19 @@ const Renderers = {
     const container = document.getElementById('ranking-edns');
     if (!container) return;
 
-    // Assistencias Junho 2026: foguinhos apenas quando há prospeccao de fechamento no mes
-    const _ASSIST = { 'edn4': 1 }; // Jhonatas: 🔥 prospecção Vitrine Iguatemi
+    // Assistencias Julho 2026: foguinhos apenas quando há prospecção de fechamento no mês
+    const _ASSIST = { 'edn4': 1 }; // Jhonatas: 🔥 auxílio no primeiro fechamento de Julho
 
-    // Geração Distribuída Junho 2026: cada GD vale +1 no ranking
-    const _GD = { 'edn5': 2 }; // Veiga: ☀️☀️ 2 fechamentos GD
+    // Geração Distribuída Julho 2026: cada GD vale +1 no ranking
+    const _GD = {}; // nenhum ainda
 
-    // Senioridade elevada — destaque visual no card
+    // Senioridade elevada — destaque visual no card (permanente)
     const _SENIOR = new Set(['exec3', 'edn4']); // Luana, Jhonatas
-    const _META   = new Set(['edn4']); // Jhonatas: META BATIDA 🎯
+    const _META   = new Set(); // nenhuma META batida ainda em Julho
 
     // Acelerador de carreira: mapa com quantidade de foguetes por vendedor
     const _ACCEL = {
-      'exec3': 2, // Luana:         🚀🚀
-      'edn5':  2, // Gabriel Veiga: 🚀🚀
-      'edn4':  2, // Jhonatas:      🚀🚀
+      'edn4': 3, // Jhonatas: 🚀🚀🚀
     };
 
     // Score de ranking = reais + foguinhos×2 + GD×1
@@ -1976,19 +1980,19 @@ const Renderers = {
 
     const ultimosFechamentos = DataService.getUltimosFechamentos() || [];
 
-    if (!ultimosFechamentos.length) {
-      fechContainer.innerHTML = '<div class="empty-state" style="width:100%"><div class="empty-icon">🤝</div>Nenhum fechamento registrado este mês</div>';
-      return;
-    }
+    /* Sempre 3 slots — slots vazios ficam invisíveis mas mantêm o espaço */
+    const slots = [...ultimosFechamentos.slice(0, 3)];
+    while (slots.length < 3) slots.push(null);
 
-    fechContainer.innerHTML = ultimosFechamentos.slice(0, 5).map(f => `
+    fechContainer.innerHTML = slots.map(f => f ? `
       <div class="fechamento-card glass">
         <div class="fech-cliente">${f.cliente || '—'}</div>
         <div class="fech-exec">✦ ${f.executivo || '—'}</div>
         <div class="fech-valor">${Utils.formataMoeda(f.valor || 0)}</div>
         <div class="fech-local" style="font-size:11px; color:var(--text-muted); margin-top:4px;">${f.data || '—'}</div>
       </div>
-    `).join('');
+    ` : `<div class="fechamento-card" style="visibility:hidden"></div>`
+    ).join('');
 
     /* Badge de totais: usa TODOS os fechamentos do mês atual (eventos), não só os cards */
     const totaisBadge = document.getElementById('fech-totais-badge');
