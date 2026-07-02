@@ -1563,12 +1563,14 @@ const RankingEngine = {
     });
 
     /* Projeção de fechamentos: 20% das reuniões realizadas 2 meses antes
-       Ex.: projeção de Abril = 20% das reuniões de Fevereiro
-       Para Jan/Fev 2026 usa o histórico de Nov/Dez 2025 como base. */
+       Ex.: projeção de Setembro = 20% das reuniões de Julho
+       Se o mês-base é o mês atual ou futuro (dados incompletos),
+       usa o alvo projetado (projReunTotal) para não colapsar a linha. */
     const projFech = Array(12).fill(null).map((_, m) => {
       if (m < 2) return null; // Jan e Fev: sem projeção
-      const reun = reunioes2026[m - 2];   // reuniões realizadas 2 meses antes
-      if (reun == null || reun === 0) return null; // sem dado = linha some (nao zera)
+      const baseM = m - 2;
+      const reun = baseM < mesAtual ? reunioes2026[baseM] : projReunTotal;
+      if (reun == null || reun === 0) return null;
       return Math.round(reun * 0.20);
     });
 
