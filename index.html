@@ -1038,6 +1038,17 @@ const DataService = {
   },
 
   init(onReady) {
+    /* Limpa localStorage automaticamente quando a versão do app muda.
+       Incrementar APP_VERSION a cada virada de mês ou mudança estrutural. */
+    const APP_VERSION = '2026-07-02';
+    const storedVersion = localStorage.getItem('lux_app_version');
+    if (storedVersion !== APP_VERSION) {
+      const token = localStorage.getItem('lux_gh_token'); // preserva o token
+      localStorage.clear();
+      if (token) localStorage.setItem('lux_gh_token', token);
+      localStorage.setItem('lux_app_version', APP_VERSION);
+    }
+
     this._checkHashToken();
     let ready = false;
     const done    = () => { if (!ready) { ready = true; this._applyMigrations(); onReady(); } };
