@@ -1990,10 +1990,12 @@ const Renderers = {
       </div>
     `).join('');
 
-    /* Badge de totais: usa TODOS os fechamentos do mês atual (eventos), não só os cards */
+    /* Badge de totais: usa TODOS os fechamentos do mês de exibição (cap igual ao gráfico) */
     const totaisBadge = document.getElementById('fech-totais-badge');
     if (totaisBadge) {
-      const mesAtualStr = new Date().toISOString().slice(0, 7);
+      const mesCap = Math.min(new Date().getMonth(), 5); // cap em Junho (índice 5)
+      const ano = new Date().getFullYear();
+      const mesAtualStr = `${ano}-${String(mesCap + 1).padStart(2, '0')}`;
       const todosFechMes = DataService.getFechamentos().filter(e => e.data && e.data.startsWith(mesAtualStr));
       const totalFat = todosFechMes.reduce((s, e) => s + (e.valorGestao || 0), 0);
       totaisBadge.textContent = `${todosFechMes.length} fech. · ${Utils.formataMoeda(totalFat)}`;
