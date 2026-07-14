@@ -1320,6 +1320,7 @@ const DataService = {
       { id:'_jl4b', vendedorId:_fid('Caio'),    data:'2026-07-13', tipo:'reuniao_realizada' },
       { id:'_jl2a', vendedorId:_fid('Jhonatas'), data:'2026-07-08', tipo:'reuniao_realizada' },
       { id:'_jlf1', vendedorId:_fid('Thiago'),  data:'2026-07-02', tipo:'fechamento', nomeCliente:'Buckman Chemistry', cidadeEstado:'', numUnidades:1, valorGestao:1800, ednId:null },
+      { id:'_jlf2', vendedorId:_fid('Brenda'),  data:'2026-07-14', tipo:'fechamento', nomeCliente:'Grupo Interação', cidadeEstado:'', numUnidades:1, valorGestao:1200, ednId:null },
     ].filter(e => e.vendedorId);
 
     // Remove eventos de Junho e Julho antigos e re-injeta Julho (determinístico)
@@ -1331,6 +1332,7 @@ const DataService = {
 
     /* Migração 10b: Cards de Últimos Fechamentos do Mês — Julho 2026 */
     this._cache.ultimos_fechamentos = [
+      { cliente: 'Grupo Interação',   executivo: 'Brenda Gino',    valor: 1200, data: '14/07/2026' },
       { cliente: 'Buckman Chemistry', executivo: 'Thiago Tannuri', valor: 1800, data: '02/07/2026' },
     ];
 
