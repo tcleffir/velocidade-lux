@@ -1324,6 +1324,7 @@ const DataService = {
       { id:'_jl4c', vendedorId:_fid('Caio'),    data:'2026-07-14', tipo:'reuniao_realizada' },
       { id:'_jl4d', vendedorId:_fid('Caio'),    data:'2026-07-15', tipo:'reuniao_realizada' },
       { id:'_jl2a', vendedorId:_fid('Jhonatas'), data:'2026-07-08', tipo:'reuniao_realizada' },
+      { id:'_jl2b', vendedorId:_fid('Jhonatas'), data:'2026-07-16', tipo:'reuniao_realizada' },
       { id:'_jl3a', vendedorId:_fid('Giovanna'), data:'2026-07-16', tipo:'reuniao_realizada' },
       { id:'_jlf1', vendedorId:_fid('Thiago'),  data:'2026-07-02', tipo:'fechamento', nomeCliente:'Buckman Chemistry', cidadeEstado:'', numUnidades:1, valorGestao:1800, ednId:null },
       { id:'_jlf2', vendedorId:_fid('Brenda'),  data:'2026-07-14', tipo:'fechamento', nomeCliente:'Grupo Interação', cidadeEstado:'', numUnidades:1, valorGestao:1200, ednId:null },
@@ -1814,7 +1815,7 @@ const Renderers = {
     if (!container) return;
 
     // Assistencias Julho 2026: foguinhos apenas quando há prospecção de fechamento no mês
-    const _ASSIST = { 'edn4': 2, 'edn2': 1 }; // Jhonatas: 🔥🔥 auxílio em 2 fechamentos de Julho | Caio: 🔥 auxílio no fechamento da Brenda (Mineração São Judas)
+    const _ASSIST = { 'edn4': 1, 'edn2': 1 }; // Jhonatas: 🔥 auxílio no primeiro fechamento de Julho | Caio: 🔥 auxílio no fechamento da Brenda (Mineração São Judas)
 
     // Geração Distribuída Julho 2026: cada GD vale +1 no ranking
     const _GD = {}; // nenhum ainda
