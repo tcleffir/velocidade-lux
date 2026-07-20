@@ -1316,6 +1316,7 @@ const DataService = {
       { id:'_jl1f', vendedorId:_fid('Luana'),   data:'2026-07-13', tipo:'reuniao_realizada' },
       { id:'_jl1g', vendedorId:_fid('Luana'),   data:'2026-07-14', tipo:'reuniao_realizada' },
       { id:'_jl1h', vendedorId:_fid('Luana'),   data:'2026-07-15', tipo:'reuniao_realizada' },
+      { id:'_jl1i', vendedorId:_fid('Luana'),   data:'2026-07-20', tipo:'reuniao_realizada' },
       { id:'_jl5a', vendedorId:_fid('Larissa'), data:'2026-07-02', tipo:'reuniao_realizada' },
       { id:'_jl5b', vendedorId:_fid('Larissa'), data:'2026-07-08', tipo:'reuniao_realizada' },
       { id:'_jl5c', vendedorId:_fid('Larissa'), data:'2026-07-15', tipo:'reuniao_realizada' },
@@ -1575,14 +1576,17 @@ const RankingEngine = {
        - Mês atual e futuros: mostra sempre a meta flat (EDNs × 12)
        Isso garante que a linha tracejada fique em 84 em Maio,
        independente do progresso real parcial do mês.               */
+    /* Overrides manuais da projeção de reuniões por mês (0=Jan … 11=Dez) */
+    const _PROJ_REUN_OVERRIDE = { 6: 36, 7: 54 }; // Jul=36, Ago=54
     const projReun = Array(12).fill(projReunTotal).map((_, i) => {
+      if (_PROJ_REUN_OVERRIDE[i] != null) return _PROJ_REUN_OVERRIDE[i]; // valor manual
       if (i >= mesAtual) return projReunTotal; // atual/futuro: sempre a meta
       const r = reunioes2026[i];
       return (r != null) ? r : projReunTotal;  // passado: segue o real
     });
 
-    /* Projeção de fechamentos: 20% das reuniões realizadas 2 meses antes
-       Ex.: projeção de Setembro = 20% das reuniões de Julho
+    /* Projeção de fechamentos: 15% das reuniões realizadas 2 meses antes
+       Ex.: projeção de Setembro = 15% das reuniões de Julho
        Se o mês-base é o mês atual ou futuro (dados incompletos),
        usa o alvo projetado (projReunTotal) para não colapsar a linha. */
     const projFech = Array(12).fill(null).map((_, m) => {
@@ -1590,7 +1594,7 @@ const RankingEngine = {
       const baseM = m - 2;
       const reun = baseM < mesAtual ? reunioes2026[baseM] : projReunTotal;
       if (reun == null || reun === 0) return null;
-      return Math.round(reun * 0.20);
+      return Math.round(reun * 0.15);
     });
 
     return {
