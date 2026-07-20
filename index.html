@@ -1640,13 +1640,12 @@ const Charts = {
           const v = ds.data[i];
           if (v == null || v === 0) return;
           /* quando barra e projeção têm o mesmo valor, os rótulos coincidem:
-             desenha lado a lado (verde à esquerda, azul à direita) */
+             empilha — projeção (azul) acima, realizado (verde) na barra */
           const colide = real[i] != null && proj[i] != null && real[i] !== 0 && proj[i] !== 0 && real[i] === proj[i];
+          ctx.textAlign = 'center';
           if (colide) {
-            ctx.textAlign = isLinha ? 'left' : 'right';
-            ctx.fillText(v, el.x + (isLinha ? 4 : -4), el.y - 4);
+            ctx.fillText(v, el.x, el.y - (isLinha ? 20 : 3));
           } else {
-            ctx.textAlign = 'center';
             ctx.fillText(v, el.x, el.y - (isLinha ? 5 : 3));
           }
         });
@@ -1660,7 +1659,7 @@ const Charts = {
       responsive: true,
       maintainAspectRatio: false,
       animation: { duration: 600 },
-      layout: { padding: { top: 20 } },
+      layout: { padding: { top: 28 } },
       plugins: { legend: { display: false }, tooltip: { enabled: false } },
       scales: {
         x: {
