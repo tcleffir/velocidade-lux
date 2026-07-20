@@ -1624,8 +1624,11 @@ const Charts = {
     id: 'valorEmCima',
     afterDatasetsDraw(chart) {
       const { ctx } = chart;
+      const barDs  = chart.data.datasets.find(d => (d.type || chart.config.type) !== 'line');
+      const lineDs = chart.data.datasets.find(d => d.type === 'line');
+      const real   = barDs  ? barDs.data  : [];
+      const proj   = lineDs ? lineDs.data : [];
       ctx.save();
-      ctx.textAlign = 'center';
       ctx.textBaseline = 'bottom';
       chart.data.datasets.forEach((ds, di) => {
         const meta = chart.getDatasetMeta(di);
@@ -1636,7 +1639,16 @@ const Charts = {
         meta.data.forEach((el, i) => {
           const v = ds.data[i];
           if (v == null || v === 0) return;
-          ctx.fillText(v, el.x, el.y - (isLinha ? 5 : 3));
+          /* quando barra e projeção têm o mesmo valor, os rótulos coincidem:
+             desenha lado a lado (verde à esquerda, azul à direita) */
+          const colide = real[i] != null && proj[i] != null && real[i] !== 0 && proj[i] !== 0 && real[i] === proj[i];
+          if (colide) {
+            ctx.textAlign = isLinha ? 'left' : 'right';
+            ctx.fillText(v, el.x + (isLinha ? 4 : -4), el.y - 4);
+          } else {
+            ctx.textAlign = 'center';
+            ctx.fillText(v, el.x, el.y - (isLinha ? 5 : 3));
+          }
         });
       });
       ctx.restore();
