@@ -1625,19 +1625,18 @@ const Charts = {
     afterDatasetsDraw(chart) {
       const { ctx } = chart;
       ctx.save();
-      ctx.font = "800 14px Montserrat, sans-serif";
       ctx.textAlign = 'center';
       ctx.textBaseline = 'bottom';
-      ctx.fillStyle = 'rgba(200, 235, 150, 1)';
       chart.data.datasets.forEach((ds, di) => {
-        /* só rotula as barras (2026 Real), não a linha de projeção */
-        if (ds.type === 'line') return;
         const meta = chart.getDatasetMeta(di);
         if (meta.hidden) return;
-        meta.data.forEach((bar, i) => {
+        const isLinha = ds.type === 'line'; // linha = projeção (azul, menor)
+        ctx.font      = isLinha ? "700 11px Montserrat, sans-serif" : "800 14px Montserrat, sans-serif";
+        ctx.fillStyle = isLinha ? 'rgba(120, 210, 255, 1)'          : 'rgba(200, 235, 150, 1)';
+        meta.data.forEach((el, i) => {
           const v = ds.data[i];
           if (v == null || v === 0) return;
-          ctx.fillText(v, bar.x, bar.y - 3);
+          ctx.fillText(v, el.x, el.y - (isLinha ? 5 : 3));
         });
       });
       ctx.restore();
@@ -1649,7 +1648,7 @@ const Charts = {
       responsive: true,
       maintainAspectRatio: false,
       animation: { duration: 600 },
-      layout: { padding: { top: 14 } },
+      layout: { padding: { top: 20 } },
       plugins: { legend: { display: false }, tooltip: { enabled: false } },
       scales: {
         x: {
