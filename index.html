@@ -1672,33 +1672,39 @@ const Charts = {
       {
         label: '2025',
         data: dados.hist2025,
+        backgroundColor: 'rgba(79, 127, 153, 0.85)',
         borderColor: this.COR_2025_LINHA,
-        backgroundColor: this.COR_2025_FILL,
-        borderWidth: 2,
-        pointRadius: 2,
-        fill: false,
-        tension: 0.3,
+        borderWidth: 0,
+        borderRadius: 4,
+        borderSkipped: false,
+        maxBarThickness: 22,
+        categoryPercentage: 0.8,
+        barPercentage: 0.9,
       },
       {
         label: '2026 Real',
         data: dados.real2026,
+        backgroundColor: 'rgba(139, 195, 74, 0.9)',
         borderColor: this.COR_2026_LINHA,
-        backgroundColor: this.COR_2026_FILL,
-        borderWidth: 2,
-        pointRadius: 2,
-        fill: false,
-        tension: 0.3,
+        borderWidth: 0,
+        borderRadius: 4,
+        borderSkipped: false,
+        maxBarThickness: 22,
+        categoryPercentage: 0.8,
+        barPercentage: 0.9,
       },
       {
         label: '2026 Proj.',
         data: dados.proj2026,
-        borderColor: this.COR_PROJ_LINHA,
-        backgroundColor: 'transparent',
+        backgroundColor: 'rgba(139, 195, 74, 0.22)',
+        borderColor: this.COR_2026_LINHA,
         borderWidth: 1.5,
-        borderDash: [5, 4],
-        pointRadius: 0,
-        fill: false,
-        tension: 0.3,
+        borderDash: [4, 3],
+        borderRadius: 4,
+        borderSkipped: false,
+        maxBarThickness: 22,
+        categoryPercentage: 0.8,
+        barPercentage: 0.9,
       },
     ];
 
@@ -1716,7 +1722,7 @@ const Charts = {
       chart.update('none');
     } else {
       this.instancias[canvasId] = new Chart(canvas, {
-        type: 'line',
+        type: 'bar',
         data: { labels: meses, datasets },
         options: opts,
       });
@@ -1726,12 +1732,12 @@ const Charts = {
     const legendaEl = document.getElementById(legendaId);
     if (legendaEl) {
       legendaEl.innerHTML = [
-        { cor: this.COR_2025_LINHA, label: '2025' },
-        { cor: this.COR_2026_LINHA, label: '2026 Real' },
-        { cor: this.COR_PROJ_LINHA, label: '2026 Proj.', dashed: true },
+        { cor: 'rgba(79, 127, 153, 0.85)', label: '2025' },
+        { cor: 'rgba(139, 195, 74, 0.9)',  label: '2026 Real' },
+        { cor: 'rgba(139, 195, 74, 0.22)', label: '2026 Proj.', dashed: true },
       ].map(l => `
         <div class="legenda-item">
-          <div class="legenda-dot" style="background:${l.cor}; ${l.dashed ? 'border-top:2px dashed '+l.cor+';background:transparent;' : ''}"></div>
+          <div class="legenda-dot" style="background:${l.cor}; border-radius:2px; ${l.dashed ? 'border:1px dashed '+this.COR_2026_LINHA+';' : ''}"></div>
           ${l.label}
         </div>
       `).join('');
