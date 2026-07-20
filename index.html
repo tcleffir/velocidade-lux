@@ -1619,11 +1619,37 @@ const Charts = {
   COR_2025_FILL:     'rgba(79, 127, 153, 0.15)',
   COR_2026_FILL:     'rgba(139, 195, 74, 0.12)',
 
+  /* Plugin inline: escreve o valor em cima de cada barra */
+  _valorEmCima: {
+    id: 'valorEmCima',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      ctx.save();
+      ctx.font = "700 9px Montserrat, sans-serif";
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      chart.data.datasets.forEach((ds, di) => {
+        const meta = chart.getDatasetMeta(di);
+        if (meta.hidden) return;
+        meta.data.forEach((bar, i) => {
+          const v = ds.data[i];
+          if (v == null || v === 0) return;
+          ctx.fillStyle = di === 0 ? 'rgba(159, 194, 214, 0.95)'
+                        : di === 1 ? 'rgba(180, 220, 120, 0.98)'
+                        :            'rgba(180, 220, 120, 0.6)';
+          ctx.fillText(v, bar.x, bar.y - 2);
+        });
+      });
+      ctx.restore();
+    },
+  },
+
   defaultOptions(mesAtual) {
     return {
       responsive: true,
       maintainAspectRatio: false,
       animation: { duration: 600 },
+      layout: { padding: { top: 14 } },
       plugins: { legend: { display: false }, tooltip: { enabled: false } },
       scales: {
         x: {
@@ -1725,6 +1751,7 @@ const Charts = {
         type: 'bar',
         data: { labels: meses, datasets },
         options: opts,
+        plugins: [this._valorEmCima],
       });
     }
 
