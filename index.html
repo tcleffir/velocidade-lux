@@ -2070,6 +2070,7 @@ const Renderers = {
           (v.nome + ' ' + v.sobrenome).trim() === (info.nome || '').trim()
         );
         const _fiDest = _mDest ? _timeImg(_mDest.id) : null;
+        const _corDest = (_mDest ? _timeCor(_mDest.id) : null) || 'rgba(255,255,255,0.3)';
         /* Sem duplicidade: número e label juntos, tudo verde e mesmo tamanho */
         const valorFmt = c.isMoeda
           ? Utils.formataMoeda(info.valor)
@@ -2079,7 +2080,7 @@ const Renderers = {
             <div class="dest-icone">${c.icone}</div>
             <div class="dest-categoria">${c.categoria}</div>
             ${_fiDest
-              ? `<div class="dest-avatar" style="padding:0;overflow:hidden;background:none;border-color:rgba(255,255,255,0.3)">${_fiDest}</div>`
+              ? `<div class="dest-avatar" style="padding:0;overflow:hidden;background:none;border:2px solid ${_corDest}">${_fiDest}</div>`
               : `<div class="dest-avatar">${iniciais}</div>`}
             <div class="dest-nome">${info.nome || '—'}</div>
             <div class="dest-valor">${valorFmt}</div>
