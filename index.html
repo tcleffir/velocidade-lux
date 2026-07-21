@@ -1872,6 +1872,17 @@ const _timeCor = (id) => {
   const k = _TIME_DE[id];
   return k ? _TIMES[k].cor : null;
 };
+/* Emoji do time (avatar do ranking/destaques) */
+const _timeEmoji = (id) => {
+  const k = _TIME_DE[id];
+  return k ? _TIMES[k].emoji : null;
+};
+
+/* Ajustes de faturamento por participação em fechamento de outra pessoa
+   (creditado ao TIME do participante). vendedorId -> valor em R$. */
+const _FAT_AJUSTE_TIME = {
+  'edn4': 900, // Jhonatas: metade do fechamento Buckman Chemistry (Thiago) — R$ 1.800 / 2
+};
 
 /* ====================================================================
    RENDERERS — funções de renderização de cada quadrante
@@ -1947,12 +1958,12 @@ const Renderers = {
       const up        = mudancas[s.vendedor.id];
       const assists   = _ASSIST[s.vendedor.id] || 0;
       const gds       = _GD[s.vendedor.id] || 0;
-      const _fi = _timeImg(s.vendedor.id);
+      const _emoji = _timeEmoji(s.vendedor.id);
       const _cor = _timeCor(s.vendedor.id) || 'rgba(255,255,255,0.3)';
       const avatarHTML = s.vendedor.foto
         ? `<div class="avatar"><img src="${s.vendedor.foto}" alt=""></div>`
-        : _fi
-          ? `<div class="avatar" style="padding:0;overflow:hidden;background:none;border:2px solid ${_cor}">${_fi}</div>`
+        : _emoji
+          ? `<div class="avatar" style="background:rgba(0,0,0,0.28);border:2px solid ${_cor};font-size:16px">${_emoji}</div>`
           : `<div class="avatar">${Utils.iniciais(s.vendedor.nome + ' ' + s.vendedor.sobrenome)}</div>`;
 
       return `
@@ -2009,12 +2020,12 @@ const Renderers = {
       const pos    = _posExec[i];
       const classe = pos === 1 ? 'destaque-exec' : 'normal';
       const medal  = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : null;
-      const _fiEx = _timeImg(s.vendedor.id);
+      const _emojiEx = _timeEmoji(s.vendedor.id);
       const _corEx = _timeCor(s.vendedor.id) || 'rgba(255,255,255,0.3)';
       const avatarHTML = s.vendedor.foto
         ? `<div class="avatar"><img src="${s.vendedor.foto}" alt=""></div>`
-        : _fiEx
-          ? `<div class="avatar" style="padding:0;overflow:hidden;background:none;border:2px solid ${_corEx}">${_fiEx}</div>`
+        : _emojiEx
+          ? `<div class="avatar" style="background:rgba(0,0,0,0.28);border:2px solid ${_corEx};font-size:16px">${_emojiEx}</div>`
           : `<div class="avatar">${Utils.iniciais(s.vendedor.nome + ' ' + s.vendedor.sobrenome)}</div>`;
       const gdEx = (_GD_EXEC || {})[s.vendedor.id] || 0;
 
@@ -2069,7 +2080,7 @@ const Renderers = {
         const _mDest = DataService.getVendedores().find(v =>
           (v.nome + ' ' + v.sobrenome).trim() === (info.nome || '').trim()
         );
-        const _fiDest = _mDest ? _timeImg(_mDest.id) : null;
+        const _emojiDest = _mDest ? _timeEmoji(_mDest.id) : null;
         const _corDest = (_mDest ? _timeCor(_mDest.id) : null) || 'rgba(255,255,255,0.3)';
         /* Sem duplicidade: número e label juntos, tudo verde e mesmo tamanho */
         const valorFmt = c.isMoeda
@@ -2079,8 +2090,8 @@ const Renderers = {
           <div class="destaque-row glass glass-green">
             <div class="dest-icone">${c.icone}</div>
             <div class="dest-categoria">${c.categoria}</div>
-            ${_fiDest
-              ? `<div class="dest-avatar" style="padding:0;overflow:hidden;background:none;border:2px solid ${_corDest}">${_fiDest}</div>`
+            ${_emojiDest
+              ? `<div class="dest-avatar" style="background:rgba(0,0,0,0.28);border:2px solid ${_corDest};font-size:18px">${_emojiDest}</div>`
               : `<div class="dest-avatar">${iniciais}</div>`}
             <div class="dest-nome">${info.nome || '—'}</div>
             <div class="dest-valor">${valorFmt}</div>
@@ -2135,7 +2146,7 @@ const Renderers = {
       const membros = t.membros.map(id => ({
         nome:     nomeDe(id),
         reunioes: byId[id] ? byId[id].reunioesRealizadas : 0,
-        receita:  byId[id] ? byId[id].totalReceita       : 0,
+        receita:  (byId[id] ? byId[id].totalReceita : 0) + (_FAT_AJUSTE_TIME[id] || 0),
         lider:    id === t.lider,
       }));
       const fatMes  = membros.reduce((a, m) => a + m.receita, 0);
