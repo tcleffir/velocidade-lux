@@ -1891,6 +1891,12 @@ const _FAT_AJUSTE_TIME = {
   'exec1': -2400, // Brenda: cede metade da Mineração São Judas ao Caio (fica com 2.400 dessa)
 };
 
+/* Ajustes de faturamento no NÍVEL DO TIME (fechamentos que entram só na Meta
+   do Mês, sem dono individual). chave do time -> valor em R$. */
+const _FAT_EXTRA_TIME = {
+  'OVG': 70, // Nexus — entra só no total do time OVG
+};
+
 /* ====================================================================
    RENDERERS — funções de renderização de cada quadrante
 ==================================================================== */
@@ -2156,7 +2162,7 @@ const Renderers = {
         receita:  (byId[id] ? byId[id].totalReceita : 0) + (_FAT_AJUSTE_TIME[id] || 0),
         lider:    id === t.lider,
       }));
-      const fatMes  = membros.reduce((a, m) => a + m.receita, 0);
+      const fatMes  = membros.reduce((a, m) => a + m.receita, 0) + (_FAT_EXTRA_TIME[k] || 0);
       const totReun = membros.reduce((a, m) => a + m.reunioes, 0);
       const acum    = (_TIME_ACUM_ANTERIOR[k] || 0) + fatMes;
       const pctMes  = Math.min(100, Math.round(fatMes / SUPER_META_MES * 100));
