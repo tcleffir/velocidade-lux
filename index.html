@@ -853,6 +853,36 @@
     }
 
     .empty-state .empty-icon { font-size: 22px; opacity: 0.4; }
+
+    /* ==== Q4: cards dos TIMES ==== */
+    .times-container { display: flex; gap: 10px; height: 100%; padding: 4px; box-sizing: border-box; }
+    .time-card {
+      flex: 1; min-width: 0; display: flex; flex-direction: column;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+      border-top: 3px solid var(--time-cor); border-radius: 12px; padding: 8px; overflow: hidden;
+    }
+    .time-banner { width: 100%; height: 54px; border-radius: 8px; overflow: hidden; margin-bottom: 6px; }
+    .time-banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .time-head { display: flex; align-items: center; gap: 6px; }
+    .time-emoji { font-size: 16px; line-height: 1; }
+    .time-nome { font-size: 12px; font-weight: 800; color: #fff; line-height: 1.1; }
+    .time-slogan { font-size: 9px; font-style: italic; color: rgba(255,255,255,0.5); margin: 2px 0 7px; }
+    .time-fat-linha { display: flex; align-items: baseline; gap: 5px; }
+    .time-fat-val { font-size: 18px; font-weight: 800; color: var(--time-cor); }
+    .time-fat-meta { font-size: 9px; color: rgba(255,255,255,0.5); }
+    .time-ok { margin-left: auto; font-size: 13px; }
+    .time-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 5px; overflow: hidden; margin: 5px 0; }
+    .time-bar-fill { height: 100%; background: var(--time-cor); border-radius: 5px; transition: width .6s ease; }
+    .time-bar-fill.ok { background: linear-gradient(90deg, var(--time-cor), #8BC34A); }
+    .time-periodo { font-size: 9px; color: rgba(255,255,255,0.45); margin-bottom: 8px; }
+    .time-membros-title { font-size: 8.5px; letter-spacing: .5px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 3px; }
+    .time-membros { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+    .time-membro { display: flex; justify-content: space-between; align-items: center; font-size: 11px; padding: 2px 5px; border-radius: 5px; background: rgba(255,255,255,0.04); }
+    .tm-nome { color: #eaf2f6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tm-reun { font-weight: 800; color: var(--time-cor); margin-left: 6px; }
+    .time-total-reun { display: flex; justify-content: space-between; align-items: center; margin-top: 7px; padding-top: 5px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 10px; color: rgba(255,255,255,0.6); }
+    .ttr-num { font-size: 15px; font-weight: 800; color: #fff; }
+    @media (max-width: 900px) { .times-container { flex-direction: column; } .time-banner { height: 72px; } }
   </style>
 </head>
 <body>
@@ -932,21 +962,9 @@
   ====================================================== -->
   <section class="quadrant" id="q4">
     <div class="quad-header">
-      <h2>Meta do Mês</h2>
+      <h2>Meta do Mês — Times</h2>
     </div>
-    <div class="metas-container">
-      <div class="meta-panel">
-        <div class="ranking-panel-title">EDNs — Reuniões</div>
-        <div class="meta-list" id="meta-edns"></div>
-        <div class="meta-rodape" id="rodape-edns"></div>
-      </div>
-      <div class="ranking-divider"></div>
-      <div class="meta-panel">
-        <div class="ranking-panel-title">Executivos — Fechamentos</div>
-        <div class="meta-list" id="meta-execs"></div>
-        <div class="meta-rodape" id="rodape-execs"></div>
-      </div>
-    </div>
+    <div class="times-container" id="times-container"></div>
   </section>
 
 </div><!-- #dashboard -->
@@ -1810,27 +1828,44 @@ const UltrapassagemState = {
 };
 
 /* ====================================================================
-   FLAGS DA COPA — bandeiras por vendedor ID (Copa do Mundo 2026)
+   TIMES 2026 — divisão da equipe em 3 times (pós-Copa)
 ==================================================================== */
-/* Códigos ISO 3166-1 alpha-2 para flagcdn.com/w40/{code}.png */
-const _FLAGS = {
-  'edn2':  'de', // Caio       — Alemanha
-  'edn3':  'jp', // Giovanna   — Japão
-  'edn4':  'fr', // Jhonatas   — França
-  'edn5':  'ci', // Veiga      — Costa do Marfim
-  'edn6':  'hr', // Lorenzo    — Croácia
-  'edn7':  'ar', // Larissa    — Argentina
-  'exec1': 'kr', // Brenda     — Coreia do Sul
-  'exec2': 'pt', // Brunno     — Portugal
-  'exec3': 'be', // Luana      — Bélgica
-  'exec5': 'nl', // Gracia/Tata — Holanda
-  'exec6': 'mx', // Eduardo    — México
-  'exec7': 'eg', // Gabriela   — Egito
-  'execT': 'nl', // Tata       — Holanda
+const SUPER_META_MES     = 9000;   // R$ 9 mil/mês por time
+const SUPER_META_PERIODO = 63000;  // R$ 63 mil no período (7 meses)
+
+const _TIMES = {
+  EF: {
+    nome: 'Executivos e Furiosos', sigla: 'EF', emoji: '🏎️',
+    slogan: 'A pista é o mercado. A vitória é nossa.',
+    cor: '#ff7a1a', avatar: 'times/ef.jpg', banner: 'times/ef_wide.jpg',
+    membros: ['exec1', 'edn3', 'edn7', 'exec6'], lider: 'exec1', // Brenda, Giovanna, Larissa, Eduardo
+  },
+  OVG: {
+    nome: 'Os Vendedores de Galinha', sigla: 'OVG', emoji: '🐔',
+    slogan: 'Vendemos tudo, até galinha.',
+    cor: '#e0b400', avatar: 'times/ovg.jpg', banner: 'times/ovg_wide.jpg',
+    membros: ['exec2', 'exec3', 'edn4'], lider: 'exec2', // Brunno, Luana, Jhonatas
+  },
+  OCC: {
+    nome: 'Os Caça-Comissão', sigla: 'OCC', emoji: '👻',
+    slogan: 'Chamou, fechou, faturou.',
+    cor: '#e23b2e', avatar: 'times/occ.jpg', banner: 'times/occ_wide.jpg',
+    membros: ['edn2', 'edn5', 'exec5'], lider: 'exec5', // Caio, Gabriel Veiga, Gabriel Gracia
+  },
 };
-const _flagImg = (id, size) => {
-  const c = _FLAGS[id];
-  return c ? `<img src="https://flagcdn.com/w${size||40}/${c}.png" style="width:100%;height:100%;object-fit:cover;display:block" alt="">` : null;
+
+/* Faturamento acumulado de meses ANTERIORES do período (super meta 7 meses).
+   Julho = mês 1, então zero. Bump manual a cada virada de mês. */
+const _TIME_ACUM_ANTERIOR = { EF: 0, OVG: 0, OCC: 0 };
+
+/* Mapa vendedorId -> chave do time */
+const _TIME_DE = {};
+Object.entries(_TIMES).forEach(([k, t]) => t.membros.forEach(id => { _TIME_DE[id] = k; }));
+
+/* Avatar do time (substitui as antigas bandeiras de país da Copa) */
+const _timeImg = (id) => {
+  const k = _TIME_DE[id];
+  return k ? `<img src="${_TIMES[k].avatar}" style="width:100%;height:100%;object-fit:cover;display:block" alt="${_TIMES[k].sigla}">` : null;
 };
 
 /* ====================================================================
@@ -1907,7 +1942,7 @@ const Renderers = {
       const up        = mudancas[s.vendedor.id];
       const assists   = _ASSIST[s.vendedor.id] || 0;
       const gds       = _GD[s.vendedor.id] || 0;
-      const _fi = _flagImg(s.vendedor.id, 40);
+      const _fi = _timeImg(s.vendedor.id);
       const avatarHTML = s.vendedor.foto
         ? `<div class="avatar"><img src="${s.vendedor.foto}" alt=""></div>`
         : _fi
@@ -1968,7 +2003,7 @@ const Renderers = {
       const pos    = _posExec[i];
       const classe = pos === 1 ? 'destaque-exec' : 'normal';
       const medal  = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : null;
-      const _fiEx = _flagImg(s.vendedor.id, 40);
+      const _fiEx = _timeImg(s.vendedor.id);
       const avatarHTML = s.vendedor.foto
         ? `<div class="avatar"><img src="${s.vendedor.foto}" alt=""></div>`
         : _fiEx
@@ -2027,7 +2062,7 @@ const Renderers = {
         const _mDest = DataService.getVendedores().find(v =>
           (v.nome + ' ' + v.sobrenome).trim() === (info.nome || '').trim()
         );
-        const _fiDest = _mDest ? _flagImg(_mDest.id, 40) : null;
+        const _fiDest = _mDest ? _timeImg(_mDest.id) : null;
         /* Sem duplicidade: número e label juntos, tudo verde e mesmo tamanho */
         const valorFmt = c.isMoeda
           ? Utils.formataMoeda(info.valor)
@@ -2075,19 +2110,57 @@ const Renderers = {
     }
   },
 
-  /* --- Q4: META DO MÊS ------------------------------------------ */
+  /* --- Q4: META DO MÊS — TIMES ---------------------------------- */
   q4() {
-    const metas    = DataService.getMetas();
-    const stats    = RankingEngine.calcularEstatisticas();
-    const edns     = stats.filter(s =>  (s.vendedor.perfil === 'EDN'       || s.vendedor.perfil === 'Ambos'));
-    const execs    = stats.filter(s => (s.vendedor.perfil === 'Executivo' || s.vendedor.perfil === 'Ambos') && !s.vendedor.ocultarTelao);
+    const container = document.getElementById('times-container');
+    if (!container) return;
 
-    this._renderMetaPanel('meta-edns', 'rodape-edns', edns,
-      s => s.reunioesRealizadas, metas.reunioesPorEDN, 'reuniões');
+    const stats = RankingEngine.calcularEstatisticas();
+    const byId  = {};
+    stats.forEach(s => { byId[s.vendedor.id] = s; });
+    const nomeDe = id => {
+      const v = byId[id] && byId[id].vendedor;
+      return v ? (v.nome + (v.sobrenome ? ' ' + v.sobrenome : '')) : id;
+    };
 
-    this._renderMetaPanel('meta-execs', 'rodape-execs', execs,
-      s => s.fechamentos, metas.fechamentosPorExecutivo, 'fechamentos',
-      s => s.totalReceita);
+    container.innerHTML = Object.entries(_TIMES).map(([k, t]) => {
+      const membros = t.membros.map(id => ({
+        nome:     nomeDe(id),
+        reunioes: byId[id] ? byId[id].reunioesRealizadas : 0,
+        receita:  byId[id] ? byId[id].totalReceita       : 0,
+        lider:    id === t.lider,
+      }));
+      const fatMes  = membros.reduce((a, m) => a + m.receita, 0);
+      const totReun = membros.reduce((a, m) => a + m.reunioes, 0);
+      const acum    = (_TIME_ACUM_ANTERIOR[k] || 0) + fatMes;
+      const pctMes  = Math.min(100, Math.round(fatMes / SUPER_META_MES * 100));
+      const batida  = fatMes >= SUPER_META_MES;
+
+      const membrosHTML = [...membros]
+        .sort((a, b) => b.reunioes - a.reunioes)
+        .map(m => `
+          <div class="time-membro">
+            <span class="tm-nome">${m.lider ? '⭐ ' : ''}${m.nome}</span>
+            <span class="tm-reun">${m.reunioes}</span>
+          </div>`).join('');
+
+      return `
+        <div class="time-card" style="--time-cor:${t.cor}">
+          <div class="time-banner"><img src="${t.banner}" alt="${t.nome}"></div>
+          <div class="time-head"><span class="time-emoji">${t.emoji}</span><span class="time-nome">${t.nome}</span></div>
+          <div class="time-slogan">"${t.slogan}"</div>
+          <div class="time-fat-linha">
+            <span class="time-fat-val">${Utils.formataMoeda(fatMes)}</span>
+            <span class="time-fat-meta">/ ${Utils.formataMoeda(SUPER_META_MES)} no mês</span>
+            ${batida ? '<span class="time-ok">✅</span>' : ''}
+          </div>
+          <div class="time-bar"><div class="time-bar-fill ${batida ? 'ok' : ''}" style="width:${pctMes}%"></div></div>
+          <div class="time-periodo">Período (7 meses): ${Utils.formataMoeda(acum)} / ${Utils.formataMoeda(SUPER_META_PERIODO)}</div>
+          <div class="time-membros-title">Reuniões realizadas</div>
+          <div class="time-membros">${membrosHTML}</div>
+          <div class="time-total-reun"><span>Total do time</span><span class="ttr-num">${totReun}</span></div>
+        </div>`;
+    }).join('');
   },
 
   _renderMetaPanel(listId, rodapeId, stats, metricFn, metaValor, label, receitaFn = null) {
