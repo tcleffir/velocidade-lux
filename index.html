@@ -861,8 +861,9 @@
       background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
       border-top: 3px solid var(--time-cor); border-radius: 12px; padding: 8px; overflow: hidden;
     }
-    .time-banner { width: 100%; height: 82px; border-radius: 8px; overflow: hidden; margin-bottom: 6px; background: rgba(0,0,0,0.25); }
-    .time-banner img { width: 100%; height: 100%; object-fit: contain; object-position: center; display: block; }
+    .time-banner { position: relative; width: 100%; height: 82px; border-radius: 8px; overflow: hidden; margin-bottom: 6px; background: #0d1f2e; }
+    .time-banner::before { content: ''; position: absolute; inset: -12%; background-image: var(--bnr); background-size: cover; background-position: center; filter: blur(14px) brightness(0.55) saturate(1.1); }
+    .time-banner img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: contain; object-position: center; display: block; }
     .time-head { display: flex; align-items: center; gap: 6px; }
     .time-emoji { font-size: 22px; line-height: 1; }
     .time-nome { font-size: 12px; font-weight: 800; color: #fff; line-height: 1.1; }
@@ -1835,7 +1836,7 @@ const SUPER_META_PERIODO = 63000;  // R$ 63 mil no período (7 meses)
 
 const _TIMES = {
   EF: {
-    nome: 'Executivos e Furiosos', sigla: 'EF', emoji: '🏎️',
+    nome: 'Executivos e Furiosos', sigla: 'EF', emoji: '⛑️',
     slogan: 'A pista é o mercado. A vitória é nossa.',
     cor: '#ff7a1a', avatar: 'times/ef.jpg', banner: 'times/ef_wide.jpg',
     membros: ['exec1', 'edn3', 'edn7', 'exec6'], lider: 'exec1', // Brenda, Giovanna, Larissa, Eduardo
@@ -2168,7 +2169,7 @@ const Renderers = {
 
       return `
         <div class="time-card" style="--time-cor:${t.cor}">
-          <div class="time-banner"><img src="${t.banner}" alt="${t.nome}"></div>
+          <div class="time-banner" style="--bnr:url('${t.banner}')"><img src="${t.banner}" alt="${t.nome}"></div>
           <div class="time-head"><span class="time-emoji">${t.emoji}</span><span class="time-nome">${t.nome}</span></div>
           <div class="time-slogan">"${t.slogan}"</div>
           <div class="time-fat-linha">
