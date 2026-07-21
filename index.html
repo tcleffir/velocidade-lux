@@ -1878,10 +1878,13 @@ const _timeEmoji = (id) => {
   return k ? _TIMES[k].emoji : null;
 };
 
-/* Ajustes de faturamento por participação em fechamento de outra pessoa
-   (creditado ao TIME do participante). vendedorId -> valor em R$. */
+/* Ajustes de faturamento SOMENTE para os totais dos TIMES na Meta do Mês
+   (não afetam Destaques nem o ranking de Receita, que mantêm o valor cheio
+   do comercial). vendedorId -> ajuste em R$ (pode ser negativo). */
 const _FAT_AJUSTE_TIME = {
-  'edn4': 900, // Jhonatas: metade do fechamento Buckman Chemistry (Thiago) — R$ 1.800 / 2
+  'edn4':   900,  // Jhonatas: metade do Buckman Chemistry (Thiago, sem time) — R$ 1.800 / 2
+  'edn2':  2400,  // Caio: metade da Mineração São Judas (Brenda) — R$ 4.800 / 2
+  'exec1': -2400, // Brenda: cede metade da Mineração São Judas ao Caio (fica com 2.400 dessa)
 };
 
 /* ====================================================================
