@@ -2254,7 +2254,7 @@ const Renderers = {
    (evita precisar de F5 manual para mudanças de layout/código).
    Compara a assinatura (ETag/Last-Modified) do index.html publicado. */
 const AutoUpdate = {
-  INTERVALO_MS: 1800000, // verifica a cada 30 min
+  INTERVALO_MS: 300000, // verifica a cada 5 min
   _assinatura: null,
   async _buscar() {
     try {
