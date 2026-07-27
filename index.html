@@ -2249,6 +2249,31 @@ const Renderers = {
 /* ====================================================================
    APP — inicialização e ciclo de atualização
 ==================================================================== */
+/* ====================================================================
+   AUTO-UPDATE — recarrega o telão sozinho quando um novo deploy sai
+   (evita precisar de F5 manual para mudanças de layout/código).
+   Compara a assinatura (ETag/Last-Modified) do index.html publicado. */
+const AutoUpdate = {
+  INTERVALO_MS: 120000, // verifica a cada 2 min
+  _assinatura: null,
+  async _buscar() {
+    try {
+      const resp = await fetch('index.html?_v=' + Date.now(), { method: 'HEAD', cache: 'no-store' });
+      return resp.headers.get('etag') || resp.headers.get('last-modified');
+    } catch (e) { return null; }
+  },
+  async init() {
+    this._assinatura = await this._buscar();
+    setInterval(async () => {
+      const atual = await this._buscar();
+      if (atual && this._assinatura && atual !== this._assinatura) {
+        console.log('[Lux Dashboard] Nova versão publicada — recarregando o telão.');
+        location.reload();
+      }
+    }, this.INTERVALO_MS);
+  },
+};
+
 const App = {
   INTERVALO_MS: 60000, // auto-refresh a cada 60 segundos
   _timer: null,
@@ -2256,6 +2281,7 @@ const App = {
   init() {
     this.refresh();
     this._timer = setInterval(() => this.refresh(), this.INTERVALO_MS);
+    AutoUpdate.init(); // auto-reload quando sair versão nova
     console.log('[Lux Dashboard] Iniciado. Auto-refresh a cada 60s.');
   },
 
